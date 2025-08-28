@@ -1,0 +1,5 @@
+{
+	name = "";
+	hostname = "";
+	home = "";
+}
