@@ -23,10 +23,10 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
-		<key>0x6f-0x100000-0x0</key>
+		<key>0x68-0x100000-0x4</key>
 		<dict>
 			<key>Action</key>
-			<integer>0</integer>
+			<integer>2</integer>
 			<key>Label</key>
 			<string></string>
 			<key>Text</key>
@@ -34,10 +34,10 @@
 			<key>Version</key>
 			<integer>0</integer>
 		</dict>
-		<key>0x75-0x100000-0x0</key>
+		<key>0x6c-0x100000-0x25</key>
 		<dict>
 			<key>Action</key>
-			<integer>2</integer>
+			<integer>0</integer>
 			<key>Label</key>
 			<string></string>
 			<key>Text</key>
@@ -66,13 +66,6 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
-		<key>0xf702-0x300000</key>
-		<dict>
-			<key>Action</key>
-			<integer>2</integer>
-			<key>Text</key>
-			<string></string>
-		</dict>
 		<key>0xf702-0x320000</key>
 		<dict>
 			<key>Action</key>
@@ -80,12 +73,16 @@
 			<key>Text</key>
 			<string></string>
 		</dict>
-		<key>0xf703-0x300000</key>
+		<key>0xf702-0x380000-0x7b</key>
 		<dict>
 			<key>Action</key>
-			<integer>0</integer>
+			<integer>2</integer>
+			<key>Label</key>
+			<string></string>
 			<key>Text</key>
 			<string></string>
+			<key>Version</key>
+			<integer>0</integer>
 		</dict>
 		<key>0xf703-0x320000</key>
 		<dict>
@@ -93,6 +90,17 @@
 			<integer>34</integer>
 			<key>Text</key>
 			<string></string>
+		</dict>
+		<key>0xf703-0x380000-0x7c</key>
+		<dict>
+			<key>Action</key>
+			<integer>0</integer>
+			<key>Label</key>
+			<string></string>
+			<key>Text</key>
+			<string></string>
+			<key>Version</key>
+			<integer>0</integer>
 		</dict>
 		<key>0xf729-0x100000</key>
 		<dict>
@@ -157,6 +165,8 @@
 	<true/>
 	<key>HotkeyModifiers</key>
 	<integer>262401</integer>
+	<key>HotkeyWindowFloatsAboveOtherWindows</key>
+	<false/>
 	<key>JobName</key>
 	<true/>
 	<key>New Bookmarks</key>
@@ -1034,7 +1044,7 @@
 			<key>HotKey Window AutoHides</key>
 			<false/>
 			<key>HotKey Window Dock Click Action</key>
-			<integer>0</integer>
+			<integer>2</integer>
 			<key>HotKey Window Floats</key>
 			<true/>
 			<key>HotKey Window Reopens On Activation</key>
