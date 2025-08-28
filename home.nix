@@ -7,6 +7,7 @@ in
 	home = {
 		packages = with pkgs; [
 			fish
+			iterm2
 		];
 
 		username = user.name;
