@@ -1,0 +1,45 @@
+diff --git a/lua/lazy/core/plugin.lua b/lua/lazy/core/plugin.lua
+index 37d1a8f..245cb81 100644
+--- a/lua/lazy/core/plugin.lua
++++ b/lua/lazy/core/plugin.lua
+@@ -287,16 +287,17 @@ function M.update_rocks_state()
+   end
+ end
+ 
+----@return LazySpecImport?
+-function M.find_local_spec()
++---@return LazySpecImport[]
++function M.find_local_specs()
+   if not Config.options.local_spec then
+-    return
++    return {}
+   end
++  local local_specs = {}
+   local path = vim.uv.cwd()
+   while path and path ~= "" do
+     local file = path .. "/" .. M.LOCAL_SPEC
+     if vim.fn.filereadable(file) == 1 then
+-      return {
++      local_specs[#local_specs + 1] = {
+         name = vim.fn.fnamemodify(file, ":~:."),
+         import = function()
+           local data = vim.secure.read(file)
+@@ -313,6 +314,7 @@ function M.find_local_spec()
+     end
+     path = p
+   end
++  return local_specs
+ end
+ 
+ function M.load()
+@@ -325,7 +327,9 @@ function M.load()
+     ---@diagnostic disable-next-line: param-type-mismatch
+     vim.deepcopy(Config.options.spec),
+   }
+-  specs[#specs + 1] = M.find_local_spec()
++  for _, local_spec in ipairs(M.find_local_specs()) do
++    specs[#specs + 1] = local_spec
++  end
+   specs[#specs + 1] = { "folke/lazy.nvim" }
+ 
+   Config.spec:parse(specs)

@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, pkgs, config, user, ... }:
 
 {
 	concatFiles = files:
@@ -7,6 +7,8 @@
 			(builtins.filter
 				(contents: builtins.stringLength contents != 0)
 				(builtins.map (path: lib.trim (builtins.readFile path)) files));
+
+	merge = sets: builtins.foldl' (a: b: lib.attrsets.recursiveUpdate a b) {} sets;
 
 	fetchrepo = { url, rev, hash, ... }:
 	let
@@ -34,4 +36,7 @@
 	in if patches != [] then pkgs.applyPatches {
 		inherit src patches;
 	} else src;
+
+	mkMutableSymlink = path: config.lib.file.mkOutOfStoreSymlink
+		("${user.home}/.dotfiles" + lib.removePrefix (toString ./..) (toString path));
 }
