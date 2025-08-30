@@ -1,1 +1,3 @@
 user.nix
+neovim/*.lua
+!neovim/init.lua

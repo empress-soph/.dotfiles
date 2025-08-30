@@ -10,18 +10,25 @@
 		};
 
 		mac-app-util.url = "github:hraban/mac-app-util";
+
+		nixvim = {
+			url = "github:nix-community/nixvim";
+			inputs.nixpkgs.follows = "nixpkgs";
+		};
 	};
 
-	outputs = { nixpkgs, home-manager, mac-app-util, ... }:
+	outputs = { nixpkgs, home-manager, mac-app-util, nixvim, ... }:
 		let
-		  lib = nixpkgs.lib;
-		  system = "aarch64-darwin";
-		  pkgs = import nixpkgs { inherit system; };
+			lib = nixpkgs.lib;
+		  	system = "aarch64-darwin";
+			pkgs = import nixpkgs { inherit system; };
 		in {
 			homeConfigurations.dotfiles = home-manager.lib.homeManagerConfiguration {
 				inherit lib pkgs;
+
 				modules = [
 					mac-app-util.homeManagerModules.default
+					nixvim.homeModules.nixvim
 					./home.nix
 				];
 			};
