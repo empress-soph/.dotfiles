@@ -60,5 +60,4 @@ if lazyPath then
 	}
 end
 
-require("theme")
 require("lazy").setup(lazyOpts)
