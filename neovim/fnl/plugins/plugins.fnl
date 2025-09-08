@@ -129,11 +129,11 @@
  (tx "Goose97/timber.nvim" {:opts {}})
 
  (tx "mistweaverco/kulala.nvim"
-	{:opts {:global_keymaps {"Send request under cursor" (tx "<localleader>ee" (fn [] (: (require :kulala) :run)) {:mode [:n :v] :ft ["http" "rest"]})
-	                         "Send request undor cursor" (tx "<localleader>er" (fn [] (: (require :kulala) :run)) {:mode [:n :v] :ft ["http" "rest"]})
-	                         "Send all requests in buffer" (tx "<localleader>eb" (fn [] (: (require :kulala) :run_all)) {:mode [:n :v] :ft ["http" "rest"]})
-	                         "Send previous request" (tx "<localleader>ep" (fn [] (: (require :kulala) :replay)) {:mode [:n :v] :ft ["http" "rest"]})
-	                         "Send previous request" (tx "<leader>rp" (fn [] (: (require :kulala) :replay)) {:mode [:n :v]})}
-			:ui {:display_mode "float"}
-			:additional_curl_options ["--insecure"]}})]
+   {:opts {:global_keymaps {"Send request under cursor" (tx "<localleader>ee" (fn [] (: (require :kulala) :run)) {:mode [:n :v] :ft ["http" "rest"]})
+                            "Send request undor cursor" (tx "<localleader>er" (fn [] (: (require :kulala) :run)) {:mode [:n :v] :ft ["http" "rest"]})
+                            "Send all requests in buffer" (tx "<localleader>eb" (fn [] (: (require :kulala) :run_all)) {:mode [:n :v] :ft ["http" "rest"]})
+                            "Send previous request" (tx "<localleader>ep" (fn [] (: (require :kulala) :replay)) {:mode [:n :v] :ft ["http" "rest"]})
+                            "Send previous request" (tx "<leader>rp" (fn [] (: (require :kulala) :replay)) {:mode [:n :v]})}
+           :ui {:display_mode "float"}
+           :additional_curl_options ["--insecure"]}})]
 

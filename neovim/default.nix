@@ -27,7 +27,12 @@ utils.merge ([{
 	xdg.configFile."nvim/parser".source = let
 		parsers = pkgs.symlinkJoin {
 			name = "treesitter-parsers";
-			paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins: with plugins; [c lua fennel])).dependencies;
+			paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins
+				(plugins: with plugins; [
+					c
+					lua
+					fennel
+				])).dependencies;
 		};
 	in "${parsers}/parser";
 
