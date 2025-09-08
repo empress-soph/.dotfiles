@@ -7,12 +7,7 @@
 					(each [_ item (ipairs list)]
 						(table.insert merged-list item))))))
 
-[(tx "LazyVim/LazyVim"
-	{:opts
-		{:colorscheme "soft_era"}})
-
-
- (tx "saghen/blink.cmp"
+[(tx "saghen/blink.cmp"
 	 {:opts
 		{:signature {:enabled true}
 		 :keymap {:preset "enter"

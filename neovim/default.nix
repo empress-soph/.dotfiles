@@ -1,10 +1,10 @@
-{ lib, pkgs, utils, ... }:
+{ lib, pkgs, utils, user, ... }:
 
 utils.merge ([{
 	programs.nixvim = import ./program.nix { inherit lib pkgs utils; };
 
 	xdg.configFile."nvim/lua".source = pkgs.stdenv.mkDerivation rec {
-		name = "neovim-lua"; src = ./.;
+		name = "${user.name}-neovim-compiled-lua"; src = ./.;
 
 		buildInputs = [
 			pkgs.lua
@@ -16,6 +16,8 @@ utils.merge ([{
 	};
 
 	xdg.configFile."nvim/treesitter".source = ./treesitter;
+
+	xdg.configFile."nvim/themes".source = ./themes;
 
 	xdg.configFile."nvim/syntax.vim".source = ./syntax.vim;
 
