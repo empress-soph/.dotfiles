@@ -9,5 +9,4 @@
 	{:opts
 		{:colorscheme "soft_era"}})
 
- {:import "plugins.core"
-  :import "plugins.snacks"}]
+  {:import "plugins.snacks"}]
