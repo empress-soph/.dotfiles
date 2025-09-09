@@ -35,9 +35,20 @@ with pkgs.vimPlugins; [
 	{ name = "mini.ai"; path = mini-nvim; }
 	{ name = "mini.comment"; path = mini-nvim; }
 	{ name = "mini.pairs"; path = mini-nvim; }
+	{ name = "mini.hipatterns"; path = mini-nvim; }
+	{ name = "mini.icons"; path = mini-nvim; }
 
 	conjure
 	nfnl
 	rainbow-delimiters-nvim
 	muren-nvim
+	git-blame-nvim
+	grug-far-nvim
+	lush-nvim
+	nvim-dap
+	nvim-dap-ui
+	nvim-treesitter-sexp
+	indent-o-matic
+	nvim-dap-virtual-text
+	nvim-dap-ui
 ]
