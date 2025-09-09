@@ -49,9 +49,9 @@ in {
           $VERBOSE_ECHO "! ${target}"
 
           if [ -d ${target} ]; then
-            rm -r ${target}
+            rm -rf ${target}
           elif [ -e ${target} ]; then
-            rm -r ${target}
+            rm -rf ${target}
           fi
         '');
 
