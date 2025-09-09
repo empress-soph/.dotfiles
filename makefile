@@ -3,3 +3,6 @@
 .PHONY: update
 update:
 	home-manager switch --flake .#dotfiles
+
+clean:
+	make -C neovim clean
