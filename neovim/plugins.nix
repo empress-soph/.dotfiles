@@ -32,7 +32,6 @@ with pkgs.vimPlugins; [
 	todo-comments-nvim
 	trouble-nvim
 	which-key-nvim
-	{ name = "catppuccin"; path = catppuccin-nvim; }
 	{ name = "mini.ai"; path = mini-nvim; }
 	{ name = "mini.comment"; path = mini-nvim; }
 	{ name = "mini.pairs"; path = mini-nvim; }
