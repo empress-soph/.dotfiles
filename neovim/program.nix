@@ -8,13 +8,29 @@
 	withRuby = false;
 
 	extraPackages = with pkgs; [
-		lua-language-server
 		fennel
-		fennel-ls
 		stylua
 		ripgrep
 		fd
 	];
+
+	plugins = {
+		lsp = {
+			enable = true;
+			servers = {
+				nil_ls.enable = true;
+				lua_ls.enable = true;
+				fennel_ls.enable = true;
+
+				marksman.enable = true;
+				bashls.enable = true;
+				jsonls.enable = true;
+				vtsls.enable = true;
+
+				html.enable = true;
+			};
+		};
+	};
 
 	extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
 
