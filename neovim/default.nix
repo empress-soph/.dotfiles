@@ -43,7 +43,7 @@ utils.merge ([{
 
 (map
 	(plugin: {
-		xdg.dataFile."nvim/lazy/${plugin.name}" = {
+		xdg.dataFile."neovim/lazy/${plugin.name}" = {
 			source = plugin.path;
 			mutable = true;
 			force = true;
