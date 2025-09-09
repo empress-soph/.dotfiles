@@ -8,16 +8,21 @@ local lazyOpts = {
 	spec = {
 		-- add LazyVim and import its plugins
 		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
+
 		-- The following configs are needed for fixing lazyvim on nix
-		-- force enable telescope-fzf-native.nvim
-		-- { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
 		-- disable mason.nvim, use programs.neovim.extraPackages
-		-- { "williamboman/mason-lspconfig.nvim", enabled = false },
-		-- { "williamboman/mason.nvim", enabled = false },
+		{ "williamboman/mason.nvim", enabled = false },
+		{ "williamboman/mason-lspconfig.nvim", enabled = false },
+		{ "jay-babu/mason-nvim-dap.nvim", enabled = false },
 		-- import/override with your plugins
 		{ import = "plugins" },
 		-- treesitter handled by xdg.configFile."nvim/parser", put this line at the end of spec to clear ensure_installed
 		{ "nvim-treesitter/nvim-treesitter", opts = function (_, opts) opts.ensure_installed = {} end },
+
+		{ "MagicDuck/grug-far.nvim", enabled = false },
+		{ "catppuccin", enabled = false },
+		{ "folke/tokyonight.nvim", enabled = false },
+		{ "folke/flash.nvim", enabled = false },
 	},
 	defaults = {
 		-- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
