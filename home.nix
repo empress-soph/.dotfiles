@@ -31,6 +31,7 @@ in (configure ([{
 			fish
 			iterm2
 			fennel
+			nurl
 		];
 
 		username = user.name;
