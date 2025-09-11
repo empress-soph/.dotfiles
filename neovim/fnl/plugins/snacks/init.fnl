@@ -2,6 +2,12 @@
 
 (local ignorefiles {})
 
+(fn contains? [tbl value]
+	(each [_ v (ipairs tbl)]
+		(when (= value v)
+			(lua "return true")))
+	false)
+
 (fn generate-vcs-ignore-globs [dir]
 	(vim.fn.system
 		["fd" "--base-directory" dir
@@ -24,13 +30,17 @@
 	        parts (vim.split sanitised-glob "/")]
 		(var path "")
 		(each [i part (ipairs parts)]
-		  (set path (.. path part))
+			(set path (.. path part))
 
-		  (table.insert ignore-globs (.. "!" path))
+			(let [include-dir-glob (.. "!" path)]
+				(when (not (contains? ignore-globs include-dir-glob))
+					(table.insert ignore-globs include-dir-glob)))
 
-		  (when (not (= (length parts) i))
-		    (table.insert ignore-globs (.. path "/*"))
-		    (set path (.. path "/"))))))
+			(when (not (= (length parts) i))
+				(let [exclude-dir-contents-glob (.. path "/*")]
+					(when (not (contains? ignore-globs exclude-dir-contents-glob))
+						(table.insert ignore-globs exclude-dir-contents-glob)))
+				(set path (.. path "/"))))))
 
 	(table.concat ignore-globs "\n")))
 
