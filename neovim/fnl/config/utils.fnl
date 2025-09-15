@@ -14,7 +14,9 @@
 			(not (= relpath ".")))))
 
 (fn get-git-toplevel [path]
-	(let [dirpath (if (vim.fn.isdirectory path) (vim.fs.dirname path) path)
+	(let [dirpath (if (= (vim.fn.isdirectory path) 0)
+			(vim.fs.dirname path)
+			path)
 		  process (vim.system ["git" "-C" dirpath "rev-parse" "--show-toplevel"])
 		  result (process:wait)]
 		(if (= result.code 0)
