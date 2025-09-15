@@ -1,6 +1,5 @@
-(fn list_merge [...]
-	(let [merged-list []]
-		(for [i 1 (select :# ...)]
-			(let [list (select i ...)]
-					(each [_ item (ipairs list)]
-						(table.insert merged-list item))))))
+; TODO make this take a variable number of lists as arguments
+(fn list-merge [a b]
+	(vim.list_extend (vim.deepcopy a) b))
+
+{: list-merge}
