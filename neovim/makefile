@@ -5,8 +5,9 @@ output-paths := $(src-paths)
 output-paths := $(patsubst %.fnl,%.lua,$(output-paths))
 output-paths := $(patsubst ./fnl/%,./lua/%,$(output-paths))
 
-ifeq (${FENNEL_PATH},)
-FENNEL_PATH := $(shell command -v fennel)
+ifeq (${NVIM_PATH},)
+NVIM_PATH := $(shell command -v nvim)
+NVIM_APPNAME := neovim
 endif
 
 .PHONY: all
@@ -17,12 +18,12 @@ $(output-paths): $(src-paths)
 macro-args := $(foreach path,$(macro-paths),--add-macro-path "$(path)")
 
 lua/%.lua: fnl/%.fnl
-	@mkdir -p $(dir $@)
-	"${FENNEL_PATH}" $(macro-args) --compile "$<" > "$@"
+	"${NVIM_PATH}" --headless -n -i NONE "$<" +NfnlCompileFile +q
+	@echo ""
 
 %.lua: %.fnl
-	@mkdir -p $(dir $@)
-	"${FENNEL_PATH}" $(macro-args) --compile "$<" > "$@"
+	"${NVIM_PATH}" --headless -n -i NONE "$<" +NfnlCompileFile +q
+	@echo ""
 
 clean:
 	rm $(output-paths)

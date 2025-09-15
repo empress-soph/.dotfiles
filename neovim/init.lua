@@ -14,7 +14,9 @@ local lazyOpts = {
 		{ "williamboman/mason.nvim", enabled = false },
 		{ "williamboman/mason-lspconfig.nvim", enabled = false },
 		{ "jay-babu/mason-nvim-dap.nvim", enabled = false },
-		-- import/override with your plugins
+
+		-- privileged position for this as all my config is written in fennel
+		{ "Olical/nfnl", ft = "fennel" },
 		{ import = "plugins" },
 		-- treesitter handled by xdg.configFile."nvim/parser", put this line at the end of spec to clear ensure_installed
 		{ "nvim-treesitter/nvim-treesitter", opts = function (_, opts) opts.ensure_installed = {} end },

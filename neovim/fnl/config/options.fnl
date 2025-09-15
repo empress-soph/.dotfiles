@@ -36,8 +36,6 @@
 
 (set vim.opt.guifont "Fantasque Sans Script12 Mono")
 
-(vim.cmd (.. "source " (vim.fs.joinpath (vim.fn.stdpath :config) :syntax.vim)))
-
 ; (: vim.treesitter.query :set_query "php" "highlights" "(variable name: (identifier) @variable.name (#eq? @variable.name \"$\"))")
 
 ; apparantly options is the place to set the local leader
