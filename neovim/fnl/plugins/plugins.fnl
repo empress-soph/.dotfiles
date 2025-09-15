@@ -21,7 +21,6 @@
 		{:callback (fn []
 			(var new-leadmultispace "•")
 			(let [buffer (vim.api.nvim_get_current_buf)]
-				(print "setting lschr" (vim.api.nvim_get_option_value "shiftwidth" {}))
 				(for [i 1 (- (vim.api.nvim_get_option_value "shiftwidth" {}) 1)]
 					(set new-leadmultispace (.. new-leadmultispace "·"))))
 			(set vim.opt.listchars (vim.tbl_extend :force vim.g.base-listchars {:leadmultispace new-leadmultispace})))}))})
