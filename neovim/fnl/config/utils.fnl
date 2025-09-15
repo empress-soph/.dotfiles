@@ -8,5 +8,11 @@
 			(lua "return true")))
 	false)
 
+(fn is-subdir? [parent child]
+	(let [relpath (vim.fs.relpath parent child)]
+		(and (not (= relpath nil))
+			(not (= relpath ".")))))
+
 {: list-merge
- : contains?}
+ : contains?
+ : is-subdir?}
