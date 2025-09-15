@@ -1,2 +1,2 @@
-{:compiler-options {:compilerEnv _G
-                    :allowedGlobals [:vim :require :math]}}
+{:compiler-options {:compilerEnv _G}}
+                    ;:allowedGlobals [:vim :require :math]}}
