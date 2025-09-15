@@ -13,6 +13,28 @@
 		(and (not (= relpath nil))
 			(not (= relpath ".")))))
 
+(fn get-git-toplevel [path]
+	(let [dirpath (if (vim.fn.isdirectory path) (vim.fs.dirname path) path)
+		  process (vim.system ["git" "-C" dirpath "rev-parse" "--show-toplevel"])
+		  result (process:wait)]
+		(if (= result.code 0)
+			(result.stdout:match "^%s*(.-)%s*$"))))
+
+(fn get-git-toplevel-recursive [base-path]
+	(let [paths []]
+		(var path base-path)
+		(var loop true)
+		(while loop
+			(set path (get-git-toplevel path))
+			(if path
+				(do
+					(table.insert paths path)
+					(set path (vim.fs.dirname path)))
+				(set loop false)))
+		paths))
+
 {: list-merge
  : contains?
- : is-subdir?}
+ : is-subdir?
+ : get-git-toplevel
+ : get-git-toplevel-recursive}
