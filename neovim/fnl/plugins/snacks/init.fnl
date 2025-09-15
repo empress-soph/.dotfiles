@@ -1,12 +1,8 @@
 (import-macros {: tx} :config.macros)
 
-(local ignorefiles {})
+(local utils (require :config.utils))
 
-(fn contains? [tbl value]
-	(each [_ v (ipairs tbl)]
-		(when (= value v)
-			(lua "return true")))
-	false)
+(local ignorefiles {})
 
 (fn generate-vcs-ignore-globs [dir]
 	(vim.fn.system
@@ -33,12 +29,12 @@
 			(set path (.. path part))
 
 			(let [include-dir-glob (.. "!" path)]
-				(when (not (contains? ignore-globs include-dir-glob))
+				(when (not (utils.contains? ignore-globs include-dir-glob))
 					(table.insert ignore-globs include-dir-glob)))
 
 			(when (not (= (length parts) i))
 				(let [exclude-dir-contents-glob (.. path "/*")]
-					(when (not (contains? ignore-globs exclude-dir-contents-glob))
+					(when (not (utils.contains? ignore-globs exclude-dir-contents-glob))
 						(table.insert ignore-globs exclude-dir-contents-glob)))
 				(set path (.. path "/"))))))
 
