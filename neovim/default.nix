@@ -28,6 +28,7 @@ utils.merge ([{
 
 			rm -rf "$home"
 		'';
+
 		installPhase = ''mv lua "$out"'';
 	};
 
@@ -49,6 +50,15 @@ utils.merge ([{
 	in "${parsers}/parser";
 
 	xdg.configFile.neovim.source = utils.mkMutableSymlink ./.;
+
+	xdg.dataFile."fennel-ls/docsets/nvim.lua".source = let
+		nvim-docset = pkgs.fetchFromSourcehut {
+			owner = "~micampe";
+			repo = "fennel-ls-nvim-docs";
+			rev = "main";
+			hash = "sha256-DVGw6xbSzxV9zXaQM3aDPWim3t/yIT3Hxorc4ugHDfo=";
+		};
+	in "${nvim-docset}/nvim.lua";
 }]
 
 ++
