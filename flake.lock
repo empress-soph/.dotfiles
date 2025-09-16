@@ -162,6 +162,26 @@
         "type": "github"
       }
     },
+    "nixcasks": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1757972350,
+        "narHash": "sha256-+/w+zNV5+W/EBGurUp+43NEkFRsZbLck3q035NELz5E=",
+        "owner": "jacekszymanski",
+        "repo": "nixcasks",
+        "rev": "9406d26bac67f2b1e0361a7d3e24b46bd9c6e239",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jacekszymanski",
+        "repo": "nixcasks",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1732617236,
@@ -259,6 +279,7 @@
       "inputs": {
         "home-manager": "home-manager",
         "mac-app-util": "mac-app-util",
+        "nixcasks": "nixcasks",
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim"
       }

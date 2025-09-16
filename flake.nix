@@ -15,22 +15,47 @@
 			url = "github:nix-community/nixvim";
 			inputs.nixpkgs.follows = "nixpkgs";
 		};
+
+		nixcasks = {
+			url = "github:jacekszymanski/nixcasks";
+			inputs.nixpkgs.follows = "nixpkgs";
+		};
 	};
 
-	outputs = { nixpkgs, home-manager, mac-app-util, nixvim, ... }:
-		let
-			lib = nixpkgs.lib;
-		  	system = "aarch64-darwin";
-			pkgs = import nixpkgs { inherit system; };
-		in {
-			homeConfigurations.dotfiles = home-manager.lib.homeManagerConfiguration {
-				inherit lib pkgs;
-
-				modules = [
-					mac-app-util.homeManagerModules.default
-					nixvim.homeModules.nixvim
-					./home.nix
-				];
+	outputs = {
+		nixpkgs,
+		home-manager,
+		mac-app-util,
+		nixvim,
+		nixcasks,
+		...
+	}: let
+		user = import ./user.nix;
+		lib = nixpkgs.lib;
+		system = user.system;
+		pkgs = import nixpkgs {
+			inherit system;
+			config.allowUnfree = true;
+			config.packageOverrides = prev: {
+				nixcasks = import nixcasks {
+					inherit pkgs nixpkgs;
+					osVersion = user.macOsVersion;
+				};
 			};
 		};
+	in {
+		homeConfigurations.dotfiles = home-manager.lib.homeManagerConfiguration {
+			inherit lib pkgs;
+
+			modules = [
+				mac-app-util.homeManagerModules.default
+				nixvim.homeModules.nixvim
+				./home.nix
+			];
+		};
+
+		nixcasks = (nixcasks.output {
+			osVersion = user.macOsVersion;
+		}).packages.${system};
+	};
 }
