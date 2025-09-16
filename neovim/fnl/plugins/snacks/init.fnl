@@ -1,6 +1,6 @@
 (import-macros {: tx} :config.macros)
 
-(local utils (require :config.utils))
+(local utils (require :lib.utils))
 
 (local ignorefiles {})
 
