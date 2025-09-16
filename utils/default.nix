@@ -39,4 +39,13 @@
 
 	mkMutableSymlink = path: config.lib.file.mkOutOfStoreSymlink
 		("${user.home}/.dotfiles" + lib.removePrefix (toString ./..) (toString path));
+
+	linkFarm = let
+		mkEntryFromDrv = drv:
+			if lib.isDerivation drv then
+				{ name = "${lib.getName drv}"; path = drv; }
+			else
+				drv;
+	in name: entries:
+		pkgs.linkFarm "${name}" (builtins.map mkEntryFromDrv entries);
 }

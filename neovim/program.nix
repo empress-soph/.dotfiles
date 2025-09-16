@@ -34,16 +34,12 @@
 
 	extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
 
-	extraConfigLua = let
+	extraConfigLuaPre = let
 		plugins = import ./plugins.nix { inherit pkgs; };
-		mkEntryFromDrv = drv:
-			if lib.isDerivation drv then
-				{ name = "${lib.getName drv}"; path = drv; }
-			else
-				drv;
-		lazyPath = pkgs.linkFarm "lazy-plugins" (builtins.map mkEntryFromDrv plugins);
-	in lib.concatStringsSep "\n\n" [
-		''local lazyPath = "${lazyPath}"''
-		(builtins.readFile ./init.lua)
-	];
+		lazyPath = utils.linkFarm "lazy-plugins" plugins;
+	in ''
+		local lazyPath = "${lazyPath}"
+	'';
+
+	extraConfigLua = builtins.readFile ./init.lua;
 }
