@@ -6,3 +6,11 @@ update:
 
 clean:
 	make -C neovim clean
+
+system-clean:
+	home-manager expire-generations -d
+	nix-store --gc
+	nix store optimise
+	nix profile wipe-history
+	home-manager remove-generations old
+	nix-collect-garbage -d
