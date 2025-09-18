@@ -29,12 +29,12 @@
 			(set path (.. path part))
 
 			(let [include-dir-glob (.. "!" path)]
-				(when (not (utils.contains? ignore-globs include-dir-glob))
+				(when (not (utils.list.contains? ignore-globs include-dir-glob))
 					(table.insert ignore-globs include-dir-glob)))
 
 			(when (not (= (length parts) i))
 				(let [exclude-dir-contents-glob (.. path "/*")]
-					(when (not (utils.contains? ignore-globs exclude-dir-contents-glob))
+					(when (not (utils.list.contains? ignore-globs exclude-dir-contents-glob))
 						(table.insert ignore-globs exclude-dir-contents-glob)))
 				(set path (.. path "/"))))))
 

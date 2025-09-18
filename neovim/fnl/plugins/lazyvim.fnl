@@ -11,4 +11,4 @@
 				  git-roots (git.get-repo-dir-from-path-recursive path)]
 				[ (. git-roots (length git-roots)) ])))
 
-		(set vim.g.root_spec (utils.list-merge ["git"] vim.g.root_spec))))})]
+		(set vim.g.root_spec (utils.list.merge ["git"] vim.g.root_spec))))})]
