@@ -20,5 +20,30 @@
 				(set loop false)))
 		paths))
 
+(fn get-head-ref [path]
+	(let [process (vim.system ["git" "-C" path "rev-parse" "--abbrev-ref" "HEAD"])
+	      result (process:wait)]
+		(if (= result.code 0)
+			(let [ref (result.stdout:match "^%s*(.-)%s*$")]
+				(if (not (= ref "HEAD"))
+					ref)))))
+
+(fn get-checked-out-tag [path]
+	(let [process (vim.system ["git" "-C" path "name-rev" "--tags" "--name-only" "HEAD"])
+	      result (process:wait)]
+		(if (= result.code 0)
+			(let [tag (result.stdout:match "^%s*(.-)%s*$")]
+				(if (not (= tag "undefined"))
+					tag)))))
+
+(fn get-checked-out-commit [path]
+	(let [process (vim.system ["git" "-C" path "rev-parse" "HEAD"])
+	      result (process:wait)]
+		(if (= result.code 0)
+			(result.stdout:match "^%s*(.-)%s*$"))))
+
 {: get-repo-dir-from-path
- : get-repo-dir-from-path-recursive}
+ : get-repo-dir-from-path-recursive
+ : get-head-ref
+ : get-checked-out-tag
+ : get-checked-out-commit}
