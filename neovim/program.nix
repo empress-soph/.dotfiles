@@ -35,7 +35,8 @@
 	extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
 
 	extraConfigLuaPre = let
-		plugins = import ./plugins.nix { inherit pkgs; };
+		# plugins = import ./plugins.nix { inherit pkgs; };
+		plugins = lib.attrsets.mapAttrsToList (_: plugin: plugin) (utils.importLockfilePkgs { lockfile = ./nix-pkgs.lock; nixpkgsPath = ["vimPlugins"]; });
 		lazyPath = utils.linkFarm "lazy-plugins" plugins;
 	in ''
 		local lazyPath = "${lazyPath}"

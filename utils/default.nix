@@ -48,4 +48,55 @@
 				drv;
 	in name: entries:
 		pkgs.linkFarm "${name}" (builtins.map mkEntryFromDrv entries);
+
+	importLockfilePkgs = { lockfile, nixpkgsPath ? null }:
+	let
+
+		nixifyName = name: builtins.replaceStrings ["."] ["-"] name;
+
+		processLock = lock:
+			let
+				matches = builtins.match "^fetch([^:]+):([^/]+)/([^#]+)#(.+)$" lock.src;
+			in if matches != null then
+				let
+					fetcherDomains = {
+						fetchFromGithub    = "github.com/";
+						fetchFromSourcehut = "git.sr.ht/~";
+						fetchFromGitlab    = "gitlab.com/";
+						fetchFromGitea     = "gitea.com/";
+						fetchFromBitbucket = "bitbucket.org/";
+						fetchFromGitiles   = "gerrit.googlesource.com/";
+						fetchFromRepoOrCz  = "repo.or.cz/";
+					};
+					fetcher = lib.elemAt matches 0;
+					owner = lib.elemAt matches 1;
+					repo = lib.elemAt matches 2;
+				in if fetcherDomains ? ${fetcher} then
+					lib.mergeAttrs lock {
+						inherit fetcher;
+						src = builtins.concatStringsSep "" ["https://" fetcherDomains.${fetcher} owner "/" repo];
+					}
+				else 
+					lib.mergeAttrs lock {
+						inherit fetcher;
+						src = "https://${owner}/${repo}";
+					}
+			else lock;
+
+		locks = lib.attrsets.mapAttrsToList
+			(name: value: lib.mergeAttrs value { inherit name; })
+			(builtins.fromJSON (builtins.readFile lockfile));
+
+		# nurlPkgs = builtins.listToAttrs (builtins.map (lock: pkgs.runCommand "${pkgs.nurl} ${parseSrc lock.src} ${lock.rev}") locks);
+		fetch = lock: (lock.fetcher lock.fetcherArgs);
+
+	in builtins.listToAttrs
+		(builtins.map (lock:
+			let
+				name = nixifyName lock.name;
+			in if builtins.trace lock (lib.strings.hasPrefix "nixpkgs" lock.src) then
+				lib.attrsets.nameValuePair name (if nixpkgsPath != null then lib.attrsets.getAttrFromPath (nixpkgsPath ++ [name]) pkgs else pkgs.${name})
+			else
+				lib.attrsets.nameValuePair name (import (fetch lock)))
+		locks);
 }

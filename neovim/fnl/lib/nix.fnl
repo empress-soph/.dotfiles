@@ -26,7 +26,7 @@
 	      result (process:wait)]
 		(if (= result.code 0)
 			(let [nurl-json (vim.json.decode (utils.string.trim result.stdout))]
-				nurl-json.args))))
+				nurl-json))))
 
 {: normalise-pkg-name
  : get-pkg-revision
