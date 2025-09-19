@@ -4,26 +4,27 @@
 
 (local plugins-lockfile-path (.. (vim.fn.stdpath :config) "/nix-pkgs.lock"))
 
-(local nurl-url-map
-	{"github.com"              "github:"
-	 "git.sr.ht"               "sourcehut:"
-	 "gitlab.com"              "gitlab:"
-	 "gitea.com"               "gitea:"
-	 "bitbucket.org"           "bitbucket:"
-	 "gerrit.googlesource.com" "gitiles:"})
+(fn get-src [original-url rev fetcher]
+	(var url (-> original-url
+	            (: :gsub "%.git$" "")
+	            (: :gsub "^https?://" "")))
 
-(fn get-src [original-url fetcher]
-	(local url (-> original-url
-		(: :gsub "%.git$" "")
-		(: :gsub "^https?://" "")))
-	(if (= fetcher "fetchFromGithub") (url:gsub "^github.com" "")
-	    (= fetcher "fetchFromSourcehut") (url:sub "^git.sr.ht" "")
-	    (= fetcher "fetchFromGitea") (url:sub "^gitea.com" "")
-	    (= fetcher "fetchFromGitlab") (url:sub "^gitlab.com" "")
-	    (= fetcher "fetchFromBitbucket") (url:sub "^bitbucket.org" "")
-	    (= fetcher "fetchFromGitiles") (url:sub "^gerrit.googlesource.com" "")
-	    (= fetcher "fetchFromRepoOrCz") (url:sub "^repo.or.cz" "")
-	    url))
+	(when fetcher
+		(set url (if (= fetcher "fetchFromGitHub") (url:gsub "^github.com/" "")
+		             (= fetcher "fetchFromSourcehut") (url:sub "^git.sr.ht/" "")
+		             (= fetcher "fetchFromGitea") (url:sub "^gitea.com/" "")
+		             (= fetcher "fetchFromGitLab") (url:sub "^gitlab.com/" "")
+		             (= fetcher "fetchFromBitbucket") (url:sub "^bitbucket.org/" "")
+		             (= fetcher "fetchFromGitiles") (url:sub "^gerrit.googlesource.com/" "")
+		             (= fetcher "fetchFromRepoOrCz") (url:sub "^repo.or.cz/" "")
+		             url))
+
+		(set url (.. fetcher ":" url)))
+
+	(when rev
+		(set url (.. url "#" (rev:sub 1 8))))
+
+	url)
 
 (fn get-version-restraint [path]
 	(let [process (vim.system ["git" "-C" path "log" "--format=%cd" "--date=format:%Y-%m-%d" "-n1" "HEAD"])
@@ -38,28 +39,36 @@
 			    ")|(" (utils.regexp.generate-number-upper-bound-regexp (- year 1)) "-\\d+-\\d+"
 			    ")$"))))
 
+(var nixpkgs-revision nil)
+
 (fn generate-plugin-lockdata [plugin lockdata]
 	(let [pkg-name (nix.normalise-pkg-name plugin.name)
 	      full-pkg-name (.. "vimPlugins." pkg-name)]
 
 		(set lockdata.rev plugin.commit)
-		; (set pkg.head (git.get-head-ref plugin.dir))
-		; (set pkg.tag (git.get-checked-out-tag plugin.dir))
+		; (set lockdata.version (git.get-checked-out-tag plugin.dir))
+		; (set lockdata.head (git.get-head-ref plugin.dir))
 
-		(if (= (nix.get-pkg-revision full-pkg-name) plugin.commit)
-			(set lockdata.src (.. "nixpkgs#" full-pkg-name))
+		(when (= (nix.get-pkg-revision full-pkg-name) plugin.commit)
+			(set lockdata.src (.. "nixpkgs/" nixpkgs-revision "#" full-pkg-name))
+			; (set lockdata.version (or lockdata.version (nix.get-pkg-version full-pkg-name))))
+			(set lockdata.hash (nix.get-pkg-hash full-pkg-name)))
 
-			(set lockdata.src (-?> plugin.dir
-				(get-version-restraint plugin.dir)
-				(#(nix.get-pkg-versions full-pkg-name $1))
-				(?. 1 :nixInstallable)))
-				(#(if (= (nix.get-pkg-revision $1) plugin.commit) $1)))
-
+		(when (and (not lockdata.src) plugin.dir)
+			(let [installable (-?> plugin.dir
+			                    (get-version-restraint plugin.dir)
+			                    (#(nix.get-available-pkg-versions full-pkg-name $1))
+			                    (?. 1 :nixInstallable))
+			      commit (-?> installable (nix.get-pkg-revision))
+			      version (-?> installable (nix.get-pkg-version))]
+				(when (and installable commit version (= commit plugin.commit))
+					(set lockdata.src installable)
+					(set lockdata.version (or lockdata.version version)))))
 
 		(when (and (not lockdata.src) plugin.url)
 			(local nurldata (nix.nurl plugin.url plugin.commit))
-			(set lockdata.hash nurldata.args.hash)
-			(set lockdata.src (.. (get-src plugin.url nurldata.fetcher) "#" (plugin.commit:sub 1 8))))
+			(set lockdata.hash (?. nurldata :args :hash))
+			(set lockdata.src (get-src plugin.url plugin.commit (?. nurldata :fetcher))))
 
 		lockdata))
 
@@ -68,7 +77,7 @@
 	(or (-?> (io.open path :r)
 	      (#(with-open [lockfile $1] (lockfile:read :*a)))
 	      (#(case (pcall vim.json.decode $1) (true json) json)))
-	    []))
+	    {}))
 
 (fn write-lockfile [path locks]
 	(with-open [lockfile (io.open path :w)]
@@ -77,6 +86,7 @@
 				{:indent "  " :sort_keys true}))))
 
 (fn update-plugins-locks [locks plugins]
+	(set nixpkgs-revision (nix.get-nixpkgs-revision))
 	(each [_ plugin (ipairs plugins)]
 		(local lockdata (or (?. locks plugin.name) {}))
 
@@ -93,11 +103,11 @@
 
 	(local locks (or (-> (read-lockfile path)
 	                   (update-plugins-locks plugins))
-	                 []))
+	                 {}))
 
 	(write-lockfile path locks))
 
-(vim.api.nvim_create_user_command "UpdateLockfile" (fn [] (update-lockfile plugins-lockfile-path)) {:bang true})
+(vim.api.nvim_create_user_command "UpdateNixpkgsLock" (fn [] (update-lockfile plugins-lockfile-path)) {:bang true})
 
 {: plugins-lockfile-path
  : read-lockfile

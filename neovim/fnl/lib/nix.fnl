@@ -7,9 +7,26 @@
 	(let [process (vim.system ["nix" "eval" "--inputs-from" (.. (or vim.env.HOME "~") "/.dotfiles") "--raw" (.. "nixpkgs#" name ".src.rev")])
 	      result (process:wait)]
 		(if (= result.code 0)
-			(result.stdout:match "^%s*\"(.-)\"%s*$"))))
+			(utils.string.trim result.stdout))))
 
-(fn get-pkg-versions [pkg-name constraint]
+(fn get-pkg-hash [name]
+	(let [process (vim.system ["nix" "eval" "--inputs-from" (.. (or vim.env.HOME "~") "/.dotfiles") "--raw" (.. "nixpkgs#" name ".src.outputHash")])
+	      result (process:wait)]
+		(if (= result.code 0)
+			(utils.string.trim result.stdout))))
+
+(fn get-pkg-version [name]
+	(let [process (vim.system ["nix" "eval" "--inputs-from" (.. (or vim.env.HOME "~") "/.dotfiles") "--raw" (.. "nixpkgs#" name ".version")])
+	      result (process:wait)]
+		(if (= result.code 0)
+			(utils.string.trim result.stdout))))
+
+(fn get-nixpkgs-revision []
+	(string.match (get-pkg-version "lib") "^%d+%.%d+%.%d+%.(.+)$"))
+
+; https://github.com/peterldowns/nix-search-cli
+; nix profile install github:vic/nix-versions
+(fn get-available-pkg-versions [pkg-name constraint]
 	(let [query (if constraint (.. pkg-name "@" constraint) pkg-name)
 	      process (vim.system ["nix-versions" query])
 	      result (process:wait)]
@@ -30,5 +47,8 @@
 
 {: normalise-pkg-name
  : get-pkg-revision
- : get-pkg-versions
+ : get-nixpkgs-revision
+ : get-pkg-hash
+ : get-pkg-version
+ : get-available-pkg-versions
  : nurl}
