@@ -51,52 +51,62 @@
 
 	importLockfilePkgs = { lockfile, nixpkgsPath ? null }:
 	let
-
 		nixifyName = name: builtins.replaceStrings ["."] ["-"] name;
-
-		processLock = lock:
-			let
-				matches = builtins.match "^fetch([^:]+):([^/]+)/([^#]+)#(.+)$" lock.src;
-			in if matches != null then
-				let
-					fetcherDomains = {
-						fetchFromGithub    = "github.com/";
-						fetchFromSourcehut = "git.sr.ht/~";
-						fetchFromGitlab    = "gitlab.com/";
-						fetchFromGitea     = "gitea.com/";
-						fetchFromBitbucket = "bitbucket.org/";
-						fetchFromGitiles   = "gerrit.googlesource.com/";
-						fetchFromRepoOrCz  = "repo.or.cz/";
-					};
-					fetcher = lib.elemAt matches 0;
-					owner = lib.elemAt matches 1;
-					repo = lib.elemAt matches 2;
-				in if fetcherDomains ? ${fetcher} then
-					lib.mergeAttrs lock {
-						inherit fetcher;
-						src = builtins.concatStringsSep "" ["https://" fetcherDomains.${fetcher} owner "/" repo];
-					}
-				else 
-					lib.mergeAttrs lock {
-						inherit fetcher;
-						src = "https://${owner}/${repo}";
-					}
-			else lock;
 
 		locks = lib.attrsets.mapAttrsToList
 			(name: value: lib.mergeAttrs value { inherit name; })
 			(builtins.fromJSON (builtins.readFile lockfile));
 
-		# nurlPkgs = builtins.listToAttrs (builtins.map (lock: pkgs.runCommand "${pkgs.nurl} ${parseSrc lock.src} ${lock.rev}") locks);
-		fetch = lock: (lock.fetcher lock.fetcherArgs);
-
 	in builtins.listToAttrs
 		(builtins.map (lock:
 			let
 				name = nixifyName lock.name;
-			in if builtins.trace lock (lib.strings.hasPrefix "nixpkgs" lock.src) then
-				lib.attrsets.nameValuePair name (if nixpkgsPath != null then lib.attrsets.getAttrFromPath (nixpkgsPath ++ [name]) pkgs else pkgs.${name})
-			else
-				lib.attrsets.nameValuePair name (import (fetch lock)))
+				matches = builtins.match "^nixpgks/(.{8})#(.*)$" lock.src;
+			in if matches != null then let
+				nixpkgs-rev = lib.elemAt matches 0;
+				pkg-path = lib.strings.splitString "." (lib.elemAt matches 1);
+				_ = builtins.trace "${lib.version} ~ ${nixpkgs-rev} | ${lock.name}" true;
+				nixpkgs = if builtins.match ''\d{2}\.\d{2}\.\d{8}\.${nixpkgs-rev}'' lib.version
+					pkgs
+				else (builtins.getFlake "nixpkgs/${nixpkgs-rev}").packages;
+			in
+				lib.attrsets.nameValuePair name
+					lib.attrsets.getAttrFromPath pkg-path nixpkgs
+			else let
+				fetcherDomains = {
+					fetchFromGithub    = "github.com/";
+					fetchFromSourcehut = "git.sr.ht/~";
+					fetchFromGitlab    = "gitlab.com/";
+					fetchFromGitea     = "gitea.com/";
+					fetchFromBitbucket = "bitbucket.org/";
+					fetchFromGitiles   = "gerrit.googlesource.com/";
+					fetchFromRepoOrCz  = "repo.or.cz/";
+				};
+
+				getFetcher = lock: let
+					# TODO actually handle other types
+					fetcherMatches = builtins.match "^(fetch[^:]+):.+$" lock.src;
+					ownerRepoRevMatches = builtins.match "^fetch[^:]+:([^/]+)/([^/#]+)#(.+)$" lock.src;
+
+					fetcherAttrs = if (fetcherMatches != null && ownerRepoRevMatches != null) then let 
+						fetcher = lib.elemAt fetcherMatches 0;
+
+						domain = if fetcherDomains ? fetcher then fetcherDomains.${fetcher} else null;
+
+						owner = lib.elemAt ownerRepoRevMatches 0;
+						repo = lib.elemAt ownerRepoRevMatches 1;
+						rev = lib.elemAt ownerRepoRevMatches 2;
+
+						src = if (domain && owner && repo) builtins.concatStringsSep "" ["https://" domain owner "/" repo];
+					in {
+						fn = fetcher;
+						args = { inherit domain owner repo rev; };
+					} else null;
+
+				fetcher = getFetcher lock;
+			in if fetcher != null then
+				lib.attrsets.nameValuePair name
+					(fetcher.fn fetcher.args)
+			else null; # TODO support flakes?
 		locks);
 }
