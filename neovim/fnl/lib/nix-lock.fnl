@@ -27,48 +27,59 @@
 	url)
 
 (fn get-version-restraint [path]
-	(let [process (vim.system ["git" "-C" path "log" "--format=%cd" "--date=format:%Y-%m-%d" "-n1" "HEAD"])
-	      result (process:wait)]
+	(local date-str (git.get-revision-date path :HEAD "%Y-%m-%d"))
+	(local (year month day) (date-str:match "^(.-)%-(.-)%-(.-)$"))
 
-		(when (= result.code 0)
-			(local date-str (utils.string.trim result.stdout))
-			(local (year month day) (date-str:match "^(.-)%-(.-)%-(.-)$"))
-
-			(.. "^("  year "-" month "-0*" (utils.regexp.generate-number-upper-bound-regexp day)
-			    ")|(" year "-0*" (utils.regexp.generate-number-upper-bound-regexp (- month 1)) "-\\d+"
-			    ")|(" (utils.regexp.generate-number-upper-bound-regexp (- year 1)) "-\\d+-\\d+"
-			    ")$"))))
+	(.. "^("  year "-" month "-0*" (utils.regexp.generate-number-upper-bound-regexp day)
+	    ")|(" year "-0*" (utils.regexp.generate-number-upper-bound-regexp (- month 1)) "-\\d+"
+	    ")|(" (utils.regexp.generate-number-upper-bound-regexp (- year 1)) "-\\d+-\\d+"
+	    ")$"))
 
 (var nixpkgs-revision nil)
 
 (fn generate-plugin-lockdata [plugin lockdata]
 	(let [pkg-name (nix.normalise-pkg-name plugin.name)
-	      full-pkg-name (.. "vimPlugins." pkg-name)]
+	      full-pkg-name (.. "vimPlugins." pkg-name)
+	      nix-revision (nix.get-pkg-revision full-pkg-name)]
 
 		(set lockdata.rev plugin.commit)
-		; (set lockdata.version (git.get-checked-out-tag plugin.dir))
-		; (set lockdata.head (git.get-head-ref plugin.dir))
+		(set lockdata.url plugin.url)
+		(set lockdata.head (git.get-head-ref plugin.dir))
 
-		(when (= (nix.get-pkg-revision full-pkg-name) plugin.commit)
-			(set lockdata.src (.. "nixpkgs/" nixpkgs-revision "#" full-pkg-name))
-			; (set lockdata.version (or lockdata.version (nix.get-pkg-version full-pkg-name))))
-			(set lockdata.hash (nix.get-pkg-hash full-pkg-name)))
+		(when nix-revision; (= nix-revision plugin.commit)
+			; (set lockdata.version (or lockdata.version (nix.get-pkg-version full-pkg-name)))
+			(set lockdata.src {:installable (.. "nixpkgs/" nixpkgs-revision "#" full-pkg-name)
+			                   :hash (nix.get-pkg-hash full-pkg-name)
+			                   :version (nix.get-pkg-version full-pkg-name)}))
+			;(set lockdata.hash (nix.get-pkg-hash full-pkg-name)))
 
-		(when (and (not lockdata.src) plugin.dir)
+		(when (and plugin.dir (or (not lockdata.src)
+		                          (not (= nix-revision plugin.commit))))
 			(let [installable (-?> plugin.dir
 			                    (get-version-restraint plugin.dir)
 			                    (#(nix.get-available-pkg-versions full-pkg-name $1))
 			                    (?. 1 :nixInstallable))
 			      commit (-?> installable (nix.get-pkg-revision))
-			      version (-?> installable (nix.get-pkg-version))]
-				(when (and installable commit version (= commit plugin.commit))
-					(set lockdata.src installable)
-					(set lockdata.version (or lockdata.version version)))))
+			      version (-?> installable (nix.get-pkg-version))
+			      hash (-?> installable (nix.get-pkg-hash))]
+				(when (and installable commit hash (= commit plugin.commit))
+					(let [src {:installable installable :hash hash :version version}]
+						(if lockdata.src
+							(set lockdata.overrideSrc src)
+							(set lockdata.src src))))))
+					; (set lockdata.version (or lockdata.version version))))
 
-		(when (and (not lockdata.src) plugin.url)
-			(local nurldata (nix.nurl plugin.url plugin.commit))
-			(set lockdata.hash (?. nurldata :args :hash))
-			(set lockdata.src (get-src plugin.url plugin.commit (?. nurldata :fetcher))))
+		(when (and plugin.url (or (not lockdata.src)
+		                          (not (= nix-revision plugin.commit))))
+			(let [nurldata (nix.nurl plugin.url plugin.commit)]
+				(set nurldata.builder "vimUtils.buildVimPlugin")
+				(set nurldata.version (or (git.get-checked-out-tag plugin.dir)
+				                          (git.get-revision-date plugin.dir :HEAD "%Y-%m-%d")))
+				(if lockdata.src
+					(set lockdata.overrideSrc nurldata)
+					(set lockdata.src nurldata))))
+				; (set lockdata.hash (?. nurldata :args :hash))
+				; (set lockdata.src (get-src plugin.url plugin.commit (?. nurldata :fetcher)))))
 
 		lockdata))
 
@@ -77,7 +88,7 @@
 	(or (-?> (io.open path :r)
 	      (#(with-open [lockfile $1] (lockfile:read :*a)))
 	      (#(case (pcall vim.json.decode $1) (true json) json)))
-	    {}))
+	    {:meta {} :pkgs {}}))
 
 (fn write-lockfile [path locks]
 	(with-open [lockfile (io.open path :w)]
@@ -88,24 +99,28 @@
 (fn update-plugins-locks [locks plugins]
 	(set nixpkgs-revision (nix.get-nixpkgs-revision))
 	(each [_ plugin (ipairs plugins)]
-		(local lockdata (or (?. locks plugin.name) {}))
+		(local lockdata (or (?. locks :pkgs plugin.name) {}))
 
 		(when (and plugin.url plugin.dir (not plugin.commit))
 			(set plugin.commit (git.get-checked-out-commit plugin.dir)))
 
 		(when (and plugin.url plugin.commit (not (= plugin.commit lockdata.rev)))
-			(tset locks plugin.name (generate-plugin-lockdata plugin lockdata))))
+			(tset locks :pkgs plugin.name (generate-plugin-lockdata plugin lockdata))))
 	locks)
 
 (fn update-lockfile [path]
 	(local lazy (require :lazy))
 	(local plugins (lazy.plugins))
 
-	(local locks (or (-> (read-lockfile path)
-	                   (update-plugins-locks plugins))
-	                 {}))
+	(local lockfile (-> (read-lockfile path)
+	                  (update-plugins-locks plugins)))
 
-	(write-lockfile path locks))
+	(set lockfile.meta.version "0.0.0")
+	(set lockfile.meta.nixpkgs (nix.get-pkg-version :lib))
+	(set lockfile.meta.neovim  (nix.get-pkg-version :neovim))
+	(set lockfile.meta.generated (os.time))
+
+	(write-lockfile path lockfile))
 
 (vim.api.nvim_create_user_command "UpdateNixpkgsLock" (fn [] (update-lockfile plugins-lockfile-path)) {:bang true})
 

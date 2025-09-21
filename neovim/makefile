@@ -26,5 +26,5 @@ lua/%.lua: fnl/%.fnl
 	@echo ""
 
 clean:
-	"${NVIM_PATH}" --headless -n -i NONE "$<" +NfnlDeleteOrphans +q
+	"${NVIM_PATH}" --headless -n -i NONE .nfnl.fnl +NfnlDeleteOrphans +q
 	rm $(output-paths)

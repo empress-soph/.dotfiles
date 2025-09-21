@@ -1,7 +1,9 @@
 { config, lib, pkgs, utils, user, ... }:
 
-{
-	programs.nixvim = import ./program.nix { inherit lib pkgs utils; };
+let
+	plugins = utils.importLockfile ./nix-pkgs.lock;
+in utils.merge ([{
+	programs.nixvim = import ./program.nix { inherit lib pkgs utils plugins; };
 
 	xdg.configFile."nvim/lua".source = let
 		nixvim = config.programs.nixvim.build.package;
@@ -40,8 +42,9 @@
 	xdg.configFile."nvim/parser".source = let
 		parsers = pkgs.symlinkJoin {
 			name = "treesitter-parsers";
+			# paths = (plugins.nvim-treesitter.withPlugins
 			paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins
-				(plugins: with plugins; [
+				(ts-plugins: with ts-plugins; [
 					c
 					lua
 					fennel
@@ -59,4 +62,25 @@
 			hash = "sha256-DVGw6xbSzxV9zXaQM3aDPWim3t/yIT3Hxorc4ugHDfo=";
 		};
 	in "${nvim-docset}/nvim.lua";
-}
+}]
+
+++
+[])
+# (map
+# 	(plugin: {
+# 		xdg.dataFile."neovim/lazy/${plugin.name}" = {
+# 			source = plugin.path;
+# 			mutable = true;
+# 			force = true;
+# 		};
+# 	})
+#
+# 	(map
+# 		(drv:
+# 			if lib.isDerivation drv then
+# 				{ name = "${lib.getName drv}"; path = drv; }
+# 			else
+# 				drv)
+#
+# 		plugins)
+# ))

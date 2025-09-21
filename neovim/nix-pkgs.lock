@@ -1,0 +1,790 @@
+{
+  "meta": {
+    "generated": 1758370354,
+    "neovim": "0.11.3",
+    "nixpkgs": "25.11.20250806.c2ae88e",
+    "version": "0.0.0"
+  },
+  "pkgs": {
+    "LazyVim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-aIcG21CkckfkWNpTjPcAQ1C3/Tsoagv/axr6e+6OLmk=",
+          "owner": "LazyVim",
+          "repo": "LazyVim",
+          "rev": "2401d5fca6f2a2fcaca4f9c4c84c4b713c602352"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-18"
+      },
+      "rev": "2401d5fca6f2a2fcaca4f9c4c84c4b713c602352",
+      "src": {
+        "hash": "0q1jhpij75ps2fkincrq59dsqlzyacm2m0c783b9dgm3vz783xnl",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.LazyVim",
+        "version": "2025-05-12"
+      },
+      "url": "https://github.com/LazyVim/LazyVim.git"
+    },
+    "baleia.nvim": {
+      "head": "main",
+      "rev": "1b25eac3ac03659c3d3af75c7455e179e5f197f7",
+      "src": {
+        "hash": "194hg3habfymcbv8sg8pzv8ajniwaqc77kf6a128hz81f11mskdp",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.baleia-nvim",
+        "version": "2024-07-24"
+      },
+      "url": "https://github.com/m00qek/baleia.nvim.git"
+    },
+    "blink.cmp": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-ygdb17DSpaWh3hAX7MkwJ8d9k4CuSo26Du73t+t6CA8=",
+          "owner": "saghen",
+          "repo": "blink.cmp",
+          "rev": "2fcf66aa31e37d4b443c669ec1bf189530dcbf20"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-17"
+      },
+      "rev": "2fcf66aa31e37d4b443c669ec1bf189530dcbf20",
+      "src": {
+        "hash": "sha256-IHRYgKcYP+JDGu8Vtawgzlhq25vpROFqb8KmpfVMwCk=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.blink-cmp",
+        "version": "1.6.0"
+      },
+      "url": "https://github.com/saghen/blink.cmp.git"
+    },
+    "bufferline.nvim": {
+      "head": "main",
+      "rev": "655133c3b4c3e5e05ec549b9f8cc2894ac6f51b3",
+      "src": {
+        "hash": "0m5363rpbjgvsnbhp9yrivbqj17lmrb5m57lpnq7dgxsmw3hrvk9",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.bufferline-nvim",
+        "version": "2025-01-14"
+      },
+      "url": "https://github.com/akinsho/bufferline.nvim.git"
+    },
+    "conform.nvim": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-j9TOSx2L19AHABdg9pLtmEUtPOCIUSo0qe2YUPBlZ5g=",
+          "owner": "stevearc",
+          "repo": "conform.nvim",
+          "rev": "b4aab989db276993ea5dcb78872be494ce546521"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-08-27"
+      },
+      "rev": "b4aab989db276993ea5dcb78872be494ce546521",
+      "src": {
+        "hash": "1yx6chdrkvwalgp8641ljdxhlcfww6l5c3z374fadb3lm3mvcvkf",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.conform-nvim",
+        "version": "2025-07-02"
+      },
+      "url": "https://github.com/stevearc/conform.nvim.git"
+    },
+    "conjure": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-Pssv1vHLfFZXRTfOWvF57GZEIjGkxBZGw6L3IFogZn8=",
+          "owner": "Olical",
+          "repo": "conjure",
+          "rev": "c7efe2af827c8fa3c396b87d6d7924d75b1afe22"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-14"
+      },
+      "rev": "c7efe2af827c8fa3c396b87d6d7924d75b1afe22",
+      "src": {
+        "hash": "0zk835l3f4x167c3ba785s5dnsrrzzb86vs6cnjsmswh33ai6p20",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.conjure",
+        "version": "2025-07-19"
+      },
+      "url": "https://github.com/Olical/conjure.git"
+    },
+    "editable-term.nvim": {
+      "head": "master",
+      "rev": "16ac164615d465fedbbb4918a4182731e1beb53b",
+      "src": {
+        "args": {
+          "hash": "sha256-i2W+7ZV7la/QgfJ4NDrOuj/+zRw2/rLQ4QukXdrn29M=",
+          "owner": "xb-bx",
+          "repo": "editable-term.nvim",
+          "rev": "16ac164615d465fedbbb4918a4182731e1beb53b"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-05-06"
+      },
+      "url": "https://github.com/xb-bx/editable-term.nvim.git"
+    },
+    "friendly-snippets": {
+      "head": "main",
+      "rev": "572f5660cf05f8cd8834e096d7b4c921ba18e175",
+      "src": {
+        "hash": "08q7vs7p4grav819b6hl5y9zla8bbb461b6m1w0mjz6n6rqjjc0p",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.friendly-snippets",
+        "version": "2025-04-29"
+      },
+      "url": "https://github.com/rafamadriz/friendly-snippets.git"
+    },
+    "git-blame.nvim": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-mJnYolfv9xuco3DwDQ6U86jCoIOiPJR8Q7WIjhIEUdE=",
+          "owner": "f-person",
+          "repo": "git-blame.nvim",
+          "rev": "9874ec1ec8bc53beb33b7cd82c092b85271a578b"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-04"
+      },
+      "rev": "9874ec1ec8bc53beb33b7cd82c092b85271a578b",
+      "src": {
+        "hash": "16mba50mjc9hp6jvkxr08z5a0lgigra3qc4xp6b8zwxfbfhz3lwr",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.git-blame-nvim",
+        "version": "2025-04-12"
+      },
+      "url": "https://github.com/f-person/git-blame.nvim.git"
+    },
+    "gitsigns.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-L5WbNiFUn014hThvGfb5r858O6iLOBhOQHfVUdIlFI4=",
+          "owner": "lewis6991",
+          "repo": "gitsigns.nvim",
+          "rev": "f780609807eca1f783a36a8a31c30a48fbe150c5"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-12"
+      },
+      "rev": "f780609807eca1f783a36a8a31c30a48fbe150c5",
+      "src": {
+        "hash": "sha256-WYHetMwxyzcAuF8m0jhueWWRrPScaED4Oezo6blt3VE=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.gitsigns-nvim",
+        "version": "scm-1-unstable-scm-1"
+      },
+      "url": "https://github.com/lewis6991/gitsigns.nvim.git"
+    },
+    "hlargs.nvim": {
+      "head": "main",
+      "rev": "ce8d705866dae44513ff48613d5e37e4da524d70",
+      "src": {
+        "args": {
+          "hash": "sha256-PEYo4tcawKgqATbKw46BIus+D0afP6Q0YSrlJ0WHAA4=",
+          "owner": "m-demare",
+          "repo": "hlargs.nvim",
+          "rev": "ce8d705866dae44513ff48613d5e37e4da524d70"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-06-16"
+      },
+      "url": "https://github.com/m-demare/hlargs.nvim.git"
+    },
+    "indent-o-matic": {
+      "head": "master",
+      "rev": "4d11e98f523d3c4500b1dc33f0d1a248a4f69719",
+      "src": {
+        "hash": "1s2hxq3jlx6mdvq5d6zdzrp6p8fc1vvkg2px95d0qw2ryqw4rixi",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.indent-o-matic",
+        "version": "2023-06-03"
+      },
+      "url": "https://github.com/Darazaki/indent-o-matic.git"
+    },
+    "kulala.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-40grZKIl74sbk3L+VJpuvPQqajY3CGeLv8eKbo4wIZU=",
+          "owner": "mistweaverco",
+          "repo": "kulala.nvim",
+          "rev": "ab3effad17d5dbb4d5d34b6289fa4dc97155045c"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "v5.3.3"
+      },
+      "rev": "ab3effad17d5dbb4d5d34b6289fa4dc97155045c",
+      "src": {
+        "hash": "16g66lzb64ddpwz1ymhk6rml6wjx7snh67qgnqm1708fxkjcrd9r",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.kulala-nvim",
+        "version": "2025-08-03"
+      },
+      "url": "https://github.com/mistweaverco/kulala.nvim.git"
+    },
+    "lazydev.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-z/nhZiGOdpQe1qZ4k6EMG4wH7KQ/1ClQUzvw9o0HxWI=",
+          "owner": "folke",
+          "repo": "lazydev.nvim",
+          "rev": "258d2a5ef4a3e3d6d9ba9da72c9725c53e9afcbd"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-17"
+      },
+      "rev": "258d2a5ef4a3e3d6d9ba9da72c9725c53e9afcbd",
+      "src": {
+        "hash": "1v4m18j270rfbjrcn99fkbiwhlmmr9bm9lcbagp533kx4n57731f",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.lazydev-nvim",
+        "version": "2025-02-20"
+      },
+      "url": "https://github.com/folke/lazydev.nvim.git"
+    },
+    "lualine.nvim": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-lWt2kpW+hsTMWt8tar/+AISTDrIt4Jn27NmI9j+Xt4s=",
+          "owner": "nvim-lualine",
+          "repo": "lualine.nvim",
+          "rev": "b8c23159c0161f4b89196f74ee3a6d02cdc3a955"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-08-12"
+      },
+      "rev": "b8c23159c0161f4b89196f74ee3a6d02cdc3a955",
+      "src": {
+        "hash": "sha256-2aPgA7riA/FubQpTkqsxLKl7OZ8L6FkucNHc2QEx2HQ=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.lualine-nvim",
+        "version": "scm-1-unstable-scm-1"
+      },
+      "url": "https://github.com/nvim-lualine/lualine.nvim.git"
+    },
+    "lush.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-ZDC2oirfDe/GqNx6+hivvNqdLutAxlBnSk51lf1yKqM=",
+          "owner": "rktjmp",
+          "repo": "lush.nvim",
+          "rev": "9c60ec2279d62487d942ce095e49006af28eed6e"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-01"
+      },
+      "rev": "9c60ec2279d62487d942ce095e49006af28eed6e",
+      "src": {
+        "hash": "sha256-qiN1gh3tNRwawc/H/zWC0FSH39zV66RTQcAjIPKinBw=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.lush-nvim",
+        "version": "scm-1-unstable-scm-1"
+      },
+      "url": "https://github.com/rktjmp/lush.nvim.git"
+    },
+    "mini.ai": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-TikVDfULxVv2tHI4tclLuD1jYOJeyc7k0HrjtiCwe/4=",
+          "owner": "nvim-mini",
+          "repo": "mini.ai",
+          "rev": "dcd346a3eda9121e917950680e5eb59f59f78aae"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-18"
+      },
+      "rev": "dcd346a3eda9121e917950680e5eb59f59f78aae",
+      "src": {
+        "hash": "045f24n8b3f1ilhhanm1m0sfr0yjprxp5a8ykyjrqc4lwh3v1jwv",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.mini-ai",
+        "version": "2025-07-22"
+      },
+      "url": "https://github.com/nvim-mini/mini.ai.git"
+    },
+    "mini.hipatterns": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-SwnFJzcarKT632iYz1FfD3mVo07UcW3+leexDtKJrdI=",
+          "owner": "nvim-mini",
+          "repo": "mini.hipatterns",
+          "rev": "96d07d32a0db0d8d8a10c83a964ec557cca005e7"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-08-28"
+      },
+      "rev": "96d07d32a0db0d8d8a10c83a964ec557cca005e7",
+      "src": {
+        "hash": "1vn4pz7ibd4ll97xrvqvl8swr88dzr9gbq5zc4ssfixrqfssb22w",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.mini-hipatterns",
+        "version": "2025-07-22"
+      },
+      "url": "https://github.com/nvim-mini/mini.hipatterns.git"
+    },
+    "mini.icons": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-Br5LHQtHJ21NWBwb9TofQhQ8HaUlF7lkKBx7fpjcHwk=",
+          "owner": "nvim-mini",
+          "repo": "mini.icons",
+          "rev": "f9a177c11daa7829389b7b6eaaec8b8a5c47052d"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-08-28"
+      },
+      "rev": "f9a177c11daa7829389b7b6eaaec8b8a5c47052d",
+      "src": {
+        "hash": "07zlbmisc8c4wj36mdnk7wlwb0qfd38zpjdkqazjzb5lfzh9hf9m",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.mini-icons",
+        "version": "2025-07-24"
+      },
+      "url": "https://github.com/nvim-mini/mini.icons.git"
+    },
+    "mini.pairs": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-Mk/UbNO7QcHw2S6HLtXlyAYo4PcXwOd5e6Nq+aZi6tA=",
+          "owner": "nvim-mini",
+          "repo": "mini.pairs",
+          "rev": "3738ea30ff33e0cbf2983dc67319a5468d25b0a9"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-08"
+      },
+      "rev": "3738ea30ff33e0cbf2983dc67319a5468d25b0a9",
+      "src": {
+        "hash": "1zwvywy9pbskip3nckbymkkrl19mvdz8ax0ixcnnavk6567v5hh5",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.mini-pairs",
+        "version": "2025-07-22"
+      },
+      "url": "https://github.com/nvim-mini/mini.pairs.git"
+    },
+    "muren.nvim": {
+      "head": "main",
+      "rev": "fa18f2df80a52afd201da062d1af0e80c8d1988e",
+      "src": {
+        "hash": "0c3jr0krri0r7d257sp0vwfxddqn443c8gm1nxxf49h2zzk0b272",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.muren-nvim",
+        "version": "2025-02-09"
+      },
+      "url": "https://github.com/AckslD/muren.nvim.git"
+    },
+    "nfnl": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-gNkbOpA9Z9Nu+sp3nrQNoWEj91Bv9JY7KR3/oVyPzdg=",
+          "owner": "Olical",
+          "repo": "nfnl",
+          "rev": "1003f43e3420475e181ce7cf609648a5e9ce35ca"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-09"
+      },
+      "rev": "1003f43e3420475e181ce7cf609648a5e9ce35ca",
+      "src": {
+        "hash": "1gmic1qsnh8fngi9plijrxprk13745pqw25n69bniqjr0fs4a4md",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nfnl",
+        "version": "2025-07-19"
+      },
+      "url": "https://github.com/Olical/nfnl.git"
+    },
+    "noice.nvim": {
+      "head": "main",
+      "rev": "0427460c2d7f673ad60eb02b35f5e9926cf67c59",
+      "src": {
+        "hash": "000y204jli68kg0s0dsqx78gkbg8zr9h2i2lzddvypfxgqjvfayk",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.noice-nvim",
+        "version": "2025-02-11"
+      },
+      "url": "https://github.com/folke/noice.nvim.git"
+    },
+    "nui.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-41slmnvt1z7sCxvpiVuFmQ9g7eCaxQi1dDCL3AxSL1A=",
+          "owner": "MunifTanjim",
+          "repo": "nui.nvim",
+          "rev": "de740991c12411b663994b2860f1a4fd0937c130"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-06-08"
+      },
+      "rev": "de740991c12411b663994b2860f1a4fd0937c130",
+      "src": {
+        "hash": "sha256-SJc9nfV6cnBKYwRWsv0iHy+RbET8frNV85reICf+pt8=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nui-nvim",
+        "version": "0.4.0-1-unstable-0.4.0-1"
+      },
+      "url": "https://github.com/MunifTanjim/nui.nvim.git"
+    },
+    "numb.nvim": {
+      "head": "master",
+      "rev": "7f564e638d3ba367abf1ec91181965b9882dd509",
+      "src": {
+        "hash": "10ig2ryx66i2aylhcnhj2dl807f8aiahw2bqzx3dgsnf77rqsmj3",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.numb-nvim",
+        "version": "2025-01-13"
+      },
+      "url": "https://github.com/nacro90/numb.nvim.git"
+    },
+    "nvim-dap": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-Pip1240aNfMwws8BTDQ3ctUS+c35mLqv9nmE0uxeL98=",
+          "owner": "mfussenegger",
+          "repo": "nvim-dap",
+          "rev": "7523676a4be17644587aa47e4d42f6f7646d4727"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-07"
+      },
+      "rev": "7523676a4be17644587aa47e4d42f6f7646d4727",
+      "src": {
+        "hash": "0id0mfll6ab5y608zhqgb16xgs13yss6c3vppn2pp5jpsvz1x6v6",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-dap",
+        "version": "2025-08-02"
+      },
+      "url": "https://github.com/mfussenegger/nvim-dap.git"
+    },
+    "nvim-dap-ui": {
+      "head": "master",
+      "rev": "cf91d5e2d07c72903d052f5207511bf7ecdb7122",
+      "src": {
+        "hash": "04378nxmh37dys2zbpwqs0wp82yr8racpmy7r44y1snx30577pfz",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-dap-ui",
+        "version": "2025-07-09"
+      },
+      "url": "https://github.com/rcarriga/nvim-dap-ui.git"
+    },
+    "nvim-dap-virtual-text": {
+      "head": "master",
+      "rev": "fbdb48c2ed45f4a8293d0d483f7730d24467ccb6",
+      "src": {
+        "hash": "1xg16c3ncs6nrd1gxdrysa1m123vzp17bx0n6v183gi79kw286zj",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-dap-virtual-text",
+        "version": "2025-05-25"
+      },
+      "url": "https://github.com/theHamsta/nvim-dap-virtual-text.git"
+    },
+    "nvim-lint": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-8X9z0pRWx9xg9nQhhQtuOu3TunObg2CIgnlPXZtx86A=",
+          "owner": "mfussenegger",
+          "repo": "nvim-lint",
+          "rev": "0864f81c681e15d9bdc1156fe3a17bd07db5a3ed"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-14"
+      },
+      "rev": "0864f81c681e15d9bdc1156fe3a17bd07db5a3ed",
+      "src": {
+        "hash": "06p4xllqkkjm2d3v2shfm5k87lxm993qc3y88kw1w9ypcrrd4r8s",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-lint",
+        "version": "2025-07-31"
+      },
+      "url": "https://github.com/mfussenegger/nvim-lint.git"
+    },
+    "nvim-lspconfig": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-l1cfmuaDmTo3q5ruipuCMeAQq97uUCmGT2Zfx4GEDL4=",
+          "owner": "neovim",
+          "repo": "nvim-lspconfig",
+          "rev": "1f7fbc34e6420476142b5cc85e9bee52717540fb"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-17"
+      },
+      "rev": "1f7fbc34e6420476142b5cc85e9bee52717540fb",
+      "src": {
+        "hash": "15bcqk3n5c3m8gnic98mcl2v33l9qxl98i0gfjblqy7n3b2b412c",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-lspconfig",
+        "version": "2025-08-03"
+      },
+      "url": "https://github.com/neovim/nvim-lspconfig.git"
+    },
+    "nvim-nio": {
+      "head": "master",
+      "rev": "21f5324bfac14e22ba26553caf69ec76ae8a7662",
+      "src": {
+        "args": {
+          "hash": "sha256-eDbzJAGdUBhTwuD0Nt9FihZj1MmVdQfn/GKIybuu5a8=",
+          "owner": "nvim-neotest",
+          "repo": "nvim-nio",
+          "rev": "21f5324bfac14e22ba26553caf69ec76ae8a7662"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "v1.10.1"
+      },
+      "url": "https://github.com/nvim-neotest/nvim-nio.git"
+    },
+    "nvim-treesitter": {
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-BGz5nlUou8uQyAXDy63OkerTpIGhHWClXLfbu97bR1U=",
+          "owner": "nvim-treesitter",
+          "repo": "nvim-treesitter",
+          "rev": "8ab64a37ea56762dc0d1a6da2bba2d4af88e3594"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-17"
+      },
+      "rev": "8ab64a37ea56762dc0d1a6da2bba2d4af88e3594",
+      "src": {
+        "hash": "1ck1qslxwi18qxrga68blvk1dg9j4jn65xiw8snq5pk06waksnq9",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-treesitter",
+        "version": "2025-05-24"
+      },
+      "url": "https://github.com/nvim-treesitter/nvim-treesitter.git"
+    },
+    "nvim-treesitter-context": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-+yj8bstmffVByX3Z/1vkUYdXvpmWGbPt+RDfkBnV11w=",
+          "owner": "nvim-treesitter",
+          "repo": "nvim-treesitter-context",
+          "rev": "41847d3dafb5004464708a3db06b14f12bde548a"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-10"
+      },
+      "rev": "41847d3dafb5004464708a3db06b14f12bde548a",
+      "src": {
+        "hash": "13dc0z4nm4x1wvgb9bzn9sm5m328a6d05zmhmzq4gvajapws9l5g",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-treesitter-context",
+        "version": "2025-07-31"
+      },
+      "url": "https://github.com/nvim-treesitter/nvim-treesitter-context.git"
+    },
+    "nvim-treesitter-sexp": {
+      "head": "master",
+      "rev": "32509f4071f9c8ba5655bf2e1ccf1f1cd8447da0",
+      "src": {
+        "hash": "1mfayp49nglk4xv1zmzdc8d6dxkjn3dqlywhwwkcdnyqg6y4c6ks",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-treesitter-sexp",
+        "version": "2024-06-07"
+      },
+      "url": "https://github.com/PaterJason/nvim-treesitter-sexp.git"
+    },
+    "nvim-treesitter-textobjects": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-+KmOpRi4JAqm6UqYdtk80jwFrJhLCs0lZM/Liofq0R4=",
+          "owner": "nvim-treesitter",
+          "repo": "nvim-treesitter-textobjects",
+          "rev": "1b2d85d3de6114c4bcea89ffb2cd1ce9e3a19931"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-08-28"
+      },
+      "rev": "1b2d85d3de6114c4bcea89ffb2cd1ce9e3a19931",
+      "src": {
+        "hash": "0pp8s0wljwhc93jp47ad4pigqm8q7v173374c1vpydhx09qwl4ga",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-treesitter-textobjects",
+        "version": "2025-07-29"
+      },
+      "url": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects.git"
+    },
+    "nvim-ts-autotag": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-nT2W5gKFEfzP7MztLjm7yqwam3ADk0svcMdLg2nmI/4=",
+          "owner": "windwp",
+          "repo": "nvim-ts-autotag",
+          "rev": "c4ca798ab95b316a768d51eaaaee48f64a4a46bc"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-11"
+      },
+      "rev": "c4ca798ab95b316a768d51eaaaee48f64a4a46bc",
+      "src": {
+        "hash": "1wl30qr6xs6xwx0s3yjkprxp802dhg45rzdiwpr9v6mwbsm5qw3b",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.nvim-ts-autotag",
+        "version": "2025-02-18"
+      },
+      "url": "https://github.com/windwp/nvim-ts-autotag.git"
+    },
+    "one-small-step-for-vimkind": {
+      "head": "main",
+      "rev": "91b4e0fb0d640def73812aceb22dafb99261dd67",
+      "src": {
+        "hash": "1nzql49pwix8k0ilz8avx704h57dkrw5ch0r4zsm9g0adq7q2fk8",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.one-small-step-for-vimkind",
+        "version": "2025-07-19"
+      },
+      "url": "https://github.com/jbyuki/one-small-step-for-vimkind.git"
+    },
+    "persistence.nvim": {
+      "head": "main",
+      "rev": "166a79a55bfa7a4db3e26fc031b4d92af71d0b51",
+      "src": {
+        "hash": "0hsfp3z93fg7vfs3ak5bixsw4d091nd21zg2pbxa414bqh6jmdca",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.persistence-nvim",
+        "version": "2025-02-25"
+      },
+      "url": "https://github.com/folke/persistence.nvim.git"
+    },
+    "plenary.nvim": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-9Un7ekhBxcnmFE1xjCCFTZ7eqIbmXvQexpnhduAg4M0=",
+          "owner": "nvim-lua",
+          "repo": "plenary.nvim",
+          "rev": "b9fd5226c2f76c951fc8ed5923d85e4de065e509"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-07-26"
+      },
+      "rev": "b9fd5226c2f76c951fc8ed5923d85e4de065e509",
+      "src": {
+        "hash": "sha256-8FV5RjF7QbDmQOQynpK7uRKONKbPRYbOPugf9ZxNvUs=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.plenary-nvim",
+        "version": "scm-1-unstable-scm-1"
+      },
+      "url": "https://github.com/nvim-lua/plenary.nvim.git"
+    },
+    "rainbow-delimiters.nvim": {
+      "head": "master",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-4zpjuu0yvA86bBANww3LAlXUczsSyQ4MGamjBWd3FZM=",
+          "owner": "hiphish",
+          "repo": "rainbow-delimiters.nvim",
+          "rev": "687ef75fdbd497eabc9eea92b52e7b4d403b3319"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-07"
+      },
+      "rev": "687ef75fdbd497eabc9eea92b52e7b4d403b3319",
+      "src": {
+        "hash": "sha256-FGM9QWpveaICACDEVc6jpJNAfJ93gFxz0VHxCrzDaYs=",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.rainbow-delimiters-nvim",
+        "version": "0.9.1"
+      },
+      "url": "https://github.com/hiphish/rainbow-delimiters.nvim.git"
+    },
+    "snacks.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-jmEHT52cqfvWeP9iJ87rNuSQg/zPgN+mNukvGBktk08=",
+          "owner": "folke",
+          "repo": "snacks.nvim",
+          "rev": "d67a47739dfc652cfcf66c59e929c704a854b37a"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-17"
+      },
+      "rev": "d67a47739dfc652cfcf66c59e929c704a854b37a",
+      "src": {
+        "hash": "0a5nw7xa33shag1h12gf930g3vcixbwk8dxv0ji4980ycskh238v",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.snacks-nvim",
+        "version": "2025-03-01"
+      },
+      "url": "https://github.com/folke/snacks.nvim.git"
+    },
+    "timber.nvim": {
+      "head": "main",
+      "rev": "d32f10e30c1056861c412a00a028869538998e30",
+      "src": {
+        "args": {
+          "hash": "sha256-K2/V855oL2OK5EyGnZFx2ihsVahJ4yWlo5L38e6Z/bQ=",
+          "owner": "Goose97",
+          "repo": "timber.nvim",
+          "rev": "d32f10e30c1056861c412a00a028869538998e30"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-07-21"
+      },
+      "url": "https://github.com/Goose97/timber.nvim.git"
+    },
+    "todo-comments.nvim": {
+      "head": "main",
+      "rev": "304a8d204ee787d2544d8bc23cd38d2f929e7cc5",
+      "src": {
+        "hash": "0hrmiaxjp11200nds3y33brj8gpbn5ykd78jfy1jiash3d44xpva",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.todo-comments-nvim",
+        "version": "2025-01-14"
+      },
+      "url": "https://github.com/folke/todo-comments.nvim.git"
+    },
+    "trouble.nvim": {
+      "head": "main",
+      "overrideSrc": {
+        "args": {
+          "hash": "sha256-W6iO5f+q4busBuP0psE7sikn87wwc1BkztsMnVkjnW0=",
+          "owner": "folke",
+          "repo": "trouble.nvim",
+          "rev": "3fb3bd737be8866e5f3a170abc70b4da8b5dd45a"
+        },
+        "builder": "vimUtils.buildVimPlugin",
+        "fetcher": "fetchFromGitHub",
+        "version": "2025-09-15"
+      },
+      "rev": "3fb3bd737be8866e5f3a170abc70b4da8b5dd45a",
+      "src": {
+        "hash": "0qn84q75dk2vbw2shh7g9i3x8m5wnhcg17zx26njpl0srykp1vva",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.trouble-nvim",
+        "version": "2025-02-12"
+      },
+      "url": "https://github.com/folke/trouble.nvim.git"
+    },
+    "ts-comments.nvim": {
+      "head": "main",
+      "rev": "1bd9d0ba1d8b336c3db50692ffd0955fe1bb9f0c",
+      "src": {
+        "hash": "0d9l90p81r753h5xynlpmykia9y6wc2fz8c7pa3szqphvw78kq7f",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.ts-comments-nvim",
+        "version": "2025-02-27"
+      },
+      "url": "https://github.com/folke/ts-comments.nvim.git"
+    },
+    "which-key.nvim": {
+      "head": "main",
+      "rev": "370ec46f710e058c9c1646273e6b225acf47cbed",
+      "src": {
+        "hash": "0am4yw7lnibgc949qvbsi4a7hqdx6gk209l5vafv5bwcvd4irwxs",
+        "installable": "nixpkgs/c2ae88e#vimPlugins.which-key-nvim",
+        "version": "2025-02-22"
+      },
+      "url": "https://github.com/folke/which-key.nvim.git"
+    }
+  }
+}

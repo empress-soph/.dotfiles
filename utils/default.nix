@@ -42,71 +42,73 @@
 
 	linkFarm = let
 		mkEntryFromDrv = drv:
-			if lib.isDerivation drv then
-				{ name = "${lib.getName drv}"; path = drv; }
-			else
-				drv;
+			let entry =
+				if lib.isDerivation drv then
+					{ name = "${lib.getName drv}"; path = drv; }
+				else if (drv ? "name") && (drv ? "outPath") then
+					{ name = drv.name; path = drv.outPath; }
+				else
+					drv;
+			in builtins.trace "entry: ${entry.name} ${entry.path}" entry;
 	in name: entries:
 		pkgs.linkFarm "${name}" (builtins.map mkEntryFromDrv entries);
 
-	importLockfilePkgs = { lockfile, nixpkgsPath ? null }:
+	importLockfile = lockfile:
 	let
 		nixifyName = name: builtins.replaceStrings ["."] ["-"] name;
 
 		locks = lib.attrsets.mapAttrsToList
 			(name: value: lib.mergeAttrs value { inherit name; })
-			(builtins.fromJSON (builtins.readFile lockfile));
+			(builtins.fromJSON (builtins.readFile lockfile)).pkgs;
 
-	in builtins.listToAttrs
-		(builtins.map (lock:
+		resolvePkg = lock:
 			let
-				name = nixifyName lock.name;
-				matches = builtins.match "^nixpgks/(.{8})#(.*)$" lock.src;
-			in if matches != null then let
+				pname = nixifyName lock.name;
+				pkg-src = lock.overrideSrc or lock.src;
+				# pkg-src = lock.src;
+
+
+			in if pkg-src ? "installable" then let
+				matches = builtins.match "nixpkgs/(.+)#(.*)" pkg-src.installable;
 				nixpkgs-rev = lib.elemAt matches 0;
 				pkg-path = lib.strings.splitString "." (lib.elemAt matches 1);
-				_ = builtins.trace "${lib.version} ~ ${nixpkgs-rev} | ${lock.name}" true;
-				nixpkgs = if builtins.match ''\d{2}\.\d{2}\.\d{8}\.${nixpkgs-rev}'' lib.version
-					pkgs
-				else (builtins.getFlake "nixpkgs/${nixpkgs-rev}").packages;
+				nixpkgs =
+					if (builtins.match ''.*\.${nixpkgs-rev}'' lib.version) != null then
+						pkgs
+					else
+						(builtins.getFlake "nixpkgs/${nixpkgs-rev}");
 			in
-				lib.attrsets.nameValuePair name
-					lib.attrsets.getAttrFromPath pkg-path nixpkgs
-			else let
-				fetcherDomains = {
-					fetchFromGithub    = "github.com/";
-					fetchFromSourcehut = "git.sr.ht/~";
-					fetchFromGitlab    = "gitlab.com/";
-					fetchFromGitea     = "gitea.com/";
-					fetchFromBitbucket = "bitbucket.org/";
-					fetchFromGitiles   = "gerrit.googlesource.com/";
-					fetchFromRepoOrCz  = "repo.or.cz/";
-				};
+				lib.attrsets.getAttrFromPath pkg-path nixpkgs
 
-				getFetcher = lock: let
-					# TODO actually handle other types
-					fetcherMatches = builtins.match "^(fetch[^:]+):.+$" lock.src;
-					ownerRepoRevMatches = builtins.match "^fetch[^:]+:([^/]+)/([^/#]+)#(.+)$" lock.src;
 
-					fetcherAttrs = if (fetcherMatches != null && ownerRepoRevMatches != null) then let 
-						fetcher = lib.elemAt fetcherMatches 0;
+			else if pkg-src ? "fetcher" then let
+				fetcher = lib.attrsets.getAttrFromPath (lib.strings.splitString "." pkg-src.fetcher) pkgs;
+				src = (fetcher pkg-src.args);
+				version = "${pkg-src.version}-${(builtins.replaceString ["fetch" "fetchFrom"] ["" ""] pkg-src.fetcher)}";
+				pkg =
+					if pkg-src ? "builder" then let 
+						builder = lib.attrsets.getAttrFromPath (lib.strings.splitString "." pkg-src.builder) pkgs;
+					in
+						(builder { inherit pname version src; })
+					else
+						src;
+			in
+				pkg
 
-						domain = if fetcherDomains ? fetcher then fetcherDomains.${fetcher} else null;
 
-						owner = lib.elemAt ownerRepoRevMatches 0;
-						repo = lib.elemAt ownerRepoRevMatches 1;
-						rev = lib.elemAt ownerRepoRevMatches 2;
+			else if pkg-src ? "flake" then
+				builtins.getFlake pkg-src.flake
+			else throw "Unknown src type";
 
-						src = if (domain && owner && repo) builtins.concatStringsSep "" ["https://" domain owner "/" repo];
-					in {
-						fn = fetcher;
-						args = { inherit domain owner repo rev; };
-					} else null;
-
-				fetcher = getFetcher lock;
-			in if fetcher != null then
-				lib.attrsets.nameValuePair name
-					(fetcher.fn fetcher.args)
-			else null; # TODO support flakes?
-		locks);
+	in builtins.listToAttrs
+		(builtins.filter (pkg: pkg != null)
+			(builtins.map
+				(lock:
+					let
+						pname = nixifyName lock.name;
+						pkg = resolvePkg lock;
+					in if pkg != null then
+						lib.attrsets.nameValuePair (builtins.trace "${pname}: ${pkg}" pname) pkg
+					else null)
+				locks));
 }

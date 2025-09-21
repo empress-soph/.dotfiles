@@ -1,4 +1,4 @@
-{ lib, pkgs, utils, ... }:
+{ lib, pkgs, utils, plugins, ... }:
 
 {
 	enable = true;
@@ -32,12 +32,20 @@
 		};
 	};
 
+	# extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
+	# extraPlugins = [ builtins.trace ((lib.attrsets.mapAtrrsToList (name: _: name) plugins.lazy-nvim (builtins.abort "no")) ];
 	extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
 
 	extraConfigLuaPre = let
-		# plugins = import ./plugins.nix { inherit pkgs; };
-		plugins = lib.attrsets.mapAttrsToList (_: plugin: plugin) (utils.importLockfilePkgs { lockfile = ./nix-pkgs.lock; nixpkgsPath = ["vimPlugins"]; });
-		lazyPath = utils.linkFarm "lazy-plugins" plugins;
+		# pluginsList = import ./plugins.nix { inherit pkgs; };
+		# lazyPath = utils.linkFarm "lazy-plugins" plugins;
+		# pluginsList = lib.attrsets.mapAttrsToList (_: plugin: plugin) plugins;
+		# pluginsList = lib.attrsets.mapAttrsToList (name: plugin: (builtins.trace plugin plugin)) plugins;
+		pluginsList = lib.attrsets.mapAttrsToList (name: plugin: plugin) plugins;
+		# pluginsList = import ./plugins.nix { inherit pkgs; };
+		lazyP = utils.linkFarm "lazy-plugins"
+			pluginsList;
+		lazyPath = builtins.trace "lazyP: ${lazyP}" lazyP;
 	in ''
 		local lazyPath = "${lazyPath}"
 	'';
