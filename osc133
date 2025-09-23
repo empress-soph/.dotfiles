@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+use lib ($ENV{RLWRAP_FILTERDIR} or ".");
+use RlwrapFilter qw(TAG_INPUT TAG_OUTPUT TAG_PROMPT TAG_HISTORY);
+use strict;
+
+use constant STATE_PROMPT       => 1;
+use constant STATE_CMD_START    => 2;
+use constant STATE_CMD_EXECUTED => 3;
+use constant STATE_CMD_FINISHED => 4;
+
+my $filter = new RlwrapFilter;
+my $name = $filter -> name;
+
+$filter -> help_text(
+	"Usage: rlwrap -z $name <command>\n" .
+	"makes command osc133 compliant\n" .
+);
+
+$filter -> prompt_handler (\&osc133ify_prompt); 
+$filter -> input_handler (\&track_cmd); 
+$filter -> output_handler (\&osc133ify_output);
+
+$filter -> run;
+
+my $cmd;
+my $state;
+
+sub track_cmd {
+	$cmd = $_;
+
+	$state = STATE_CMD_START;
+
+	return $cmd;
+}
+
+sub osc133ify_prompt {
+	my ($raw_prompt) = @_;
+
+	if ($state == STATE_CMD_FINISHED && $cmd) {
+		$filter -> send_output_oob("\033]133;D;\007");
+
+		undef $cmd;
+	}
+
+	my $prompt = $raw_prompt;
+	my $space = "";
+
+	if ($raw_prompt =~ m/^(.*?)(\s*)$/) {
+		$prompt = $1;
+		$space = $2;
+	}
+
+	$state = STATE_PROMPT;
+
+	return "\001\033]133;A;\007\002$prompt\001\033]133;B;\007\002$space";
+}
+
+sub osc133ify_output {
+	my ($output) = @_;
+
+	if ($state == STATE_CMD_START) {
+		$state = STATE_CMD_EXECUTED;
+
+		return $output;
+	}
+
+	if ($state == STATE_CMD_EXECUTED && $cmd) {
+		$filter -> send_output_oob("\033]133;C;" . ($cmd =~ s/([^A-Za-z0-9\n])/sprintf("%%%02X", ord($1))/segr) . "\007");
+	}
+
+	$state = STATE_CMD_FINISHED;
+
+	return $output;
+}
