@@ -12,4 +12,4 @@
 (vim.api.nvim_create_autocmd
 	"User"
 	{:pattern [:LazyInstall :LazyUpdate]
-	 :callback (fn [args] (nix-lock.update-lockfile nix-lock.lockfile-path))})
+	 :callback (fn [args] (nix-lock.update-lockfile nix-lock.plugins-lockfile-path))})
