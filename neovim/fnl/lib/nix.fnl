@@ -12,7 +12,7 @@
 (fn get-pkg-revision [name]
 	(or (eval (.. "nixpkgs#" name ".src.rev")
 	    (-?> (eval (.. "nixpkgs#" name ".src.rev"))
-	      (: :match "^https://github%.com/.+/archive/([^/]+)%.zip$")))))
+	      (string.match "^https://github%.com/.+/archive/([^/]+)%.zip$")))))
 
 (fn get-pkg-hash [name]
 	(eval (.. "nixpkgs#" name ".src.outputHash")))
@@ -21,7 +21,8 @@
 	(eval (.. "nixpkgs#" name ".version")))
 
 (fn get-nixpkgs-revision []
-	(string.match (get-pkg-version "lib") "^%d+%.%d+%.%d+%.(.+)$"))
+	(-?> (get-pkg-version "lib")
+	  (string.match "^%d+%.%d+%.%d+%.(.+)$")))
 
 ; https://github.com/peterldowns/nix-search-cli
 ; nix profile install github:vic/nix-versions

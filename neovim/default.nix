@@ -20,15 +20,15 @@ in utils.merge ([{
 
 		(_: prev': {
 			vimPlugins = prev'.vimPlugins.extend (_: prev: {
-				nvim-treesitter = prev.nvim-treesitter.overrideAttrs (old: {
-					# https://github.com/NixOS/nixpkgs/issues/415438#issuecomment-3186621192
-					postPatch = "";
-					buildPhase = ''
-						mkdir -p $out/queries
-						cp -a $src/runtime/queries/* $out/queries
-					'';
-					nvimSkipModules = [ "nvim-treesitter._meta.parsers" ];
-				});
+				# nvim-treesitter = prev.nvim-treesitter.overrideAttrs (old: {
+				# 	# https://github.com/NixOS/nixpkgs/issues/415438#issuecomment-3186621192
+				# 	postPatch = "";
+				# 	buildPhase = ''
+				# 		mkdir -p $out/queries
+				# 		cp -a $src/runtime/queries/* $out/queries
+				# 	'';
+				# 	nvimSkipModules = [ "nvim-treesitter._meta.parsers" ];
+				# });
 
 				lazy-nvim = prev.lazy-nvim.overrideAttrs (old: {
 					patches = (old.patches or []) ++ [

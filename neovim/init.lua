@@ -7,12 +7,12 @@ end
 local lazyOpts = {
 	spec = {
 		-- add LazyVim and import its plugins
-		{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
+		{ "LazyVim/LazyVim", import = "lazyvim.plugins", dependencies = { "folke/lazy.nvim" } },
 
 		-- The following configs are needed for fixing lazyvim on nix
 		-- disable mason.nvim, use programs.neovim.extraPackages
-		{ "williamboman/mason.nvim", enabled = false },
-		{ "williamboman/mason-lspconfig.nvim", enabled = false },
+		{ "mason-org/mason.nvim", enabled = false },
+		{ "mason-org/mason-lspconfig.nvim", enabled = false },
 		{ "jay-babu/mason-nvim-dap.nvim", enabled = false },
 
 		-- privileged position for this as all my config is written in fennel

@@ -31,6 +31,7 @@
 		pkgs = import nixpkgs {
 			inherit system;
 			config.allowUnfree = true;
+
 			config.packageOverrides = prev: {
 				nixcasks = import nixcasks {
 					inherit pkgs nixpkgs;
