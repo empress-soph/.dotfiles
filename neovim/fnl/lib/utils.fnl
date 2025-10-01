@@ -57,6 +57,73 @@
 		(and (not (= relpath nil))
 			(not (= relpath ".")))))
 
+(fn parse-text-table [header body]
+	(local columns [])
+	(var i 1)
+	(while (< i (length header))
+		(local (start end) (header:find "[^%s]+ *" i))
+		(when (and start end)
+			(local name (-> (header:sub start end)
+				(str-trim)
+				(str-lcfirst)))
+			(table.insert columns {:name name :start start :end end}))
+		(set i (+ (or end i) 1)))
+
+	(local tbl [])
+	(each [_ line (ipairs body)]
+		(local row {})
+		(each [_ column (ipairs columns)]
+			(local value (str-trim (line:sub column.start column.end)))
+			(tset row column.name value))
+		(table.insert tbl row))
+
+	tbl)
+
+(fn get-digit-range-regexp [lower-bound upper-bound]
+	(let [lower (math.max 0 (math.min 9 (tonumber (or lower-bound 0))))
+		  upper (math.max 0 (math.min 9 (tonumber (or upper-bound 9))))]
+
+		(if (= lower upper) (tostring lower)
+			(.. "[" lower "-" upper "]"))))
+
+(fn generate-number-upper-bound-regexp [number]
+	(local regexps [])
+	(local number-str (tostring number))
+	(local reversed (number-str:reverse))
+
+	(for [i 1 (length number-str)]
+		(when (or (not (= (reversed:sub i i) "0")))
+		          (= i 1)
+			(for [j 1 (length number-str)]
+				(local digit (reversed:sub j j))
+
+				(let [regexp (if (and (= i 1) (= j 1)) (get-digit-range-regexp 0 digit)
+				                 (= j i) (get-digit-range-regexp 0 (- digit 1))
+				                 (< j i) (get-digit-range-regexp 0 9)
+				                 digit)]
+						(tset regexps i (.. regexp (or (?. regexps i) "")))))))
+
+	(table.concat (icollect [_ regexp (pairs regexps)] regexp) "|"))
+
+(fn generate-number-lower-bound-regexp [number]
+	(local regexps [])
+	(local number-str (tostring number))
+	(local reversed (number-str:reverse))
+
+	(for [i 1 (length number-str)]
+		(when (or (not (= (reversed:sub i i) "0")))
+		          (= i 1)
+			(for [j 1 (length number-str)]
+				(local digit (reversed:sub j j))
+
+				(let [regexp (if (and (= i 1) (= j 1)) (get-digit-range-regexp digit 9)
+				                 (= j i) (get-digit-range-regexp (- digit 1) 9)
+				                 (< j i) (get-digit-range-regexp 0 9)
+				                 digit)]
+						(tset regexps i (.. regexp (or (?. regexps i) "")))))))
+
+	(table.concat (icollect [_ regexp (pairs regexps)] regexp) "|"))
+
 {:list
 	{:find-index list-find-index
 	 :contains? list-contains?
@@ -69,4 +136,10 @@
 	 :trim str-trim
 	 :lcfirst str-lcfirst
 	 :ucfirst str-ucfirst}
- :fs {: is-subdir?}}
+ :regexp
+	{: generate-number-lower-bound-regexp
+	 : generate-number-upper-bound-regexp}
+ :fs
+	{: is-subdir?}
+ :misc
+	{: parse-text-table}}

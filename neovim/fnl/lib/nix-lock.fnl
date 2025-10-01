@@ -18,6 +18,19 @@
 		(: :gsub "^https?://(.-)/~?" nurl-url-map)
 		(: :gsub "^(.-)/~?" nurl-url-map)))
 
+(fn get-version-restraint [path]
+	(let [process (vim.system ["git" "-C" path "log" "--format=%cd" "--date=format:%Y-%m-%d" "-n1" "HEAD"])
+	      result (process:wait)]
+
+		(when (= result.code 0)
+			(local date-str (utils.string.trim result.stdout))
+			(local (year month day) (date-str:match "^(.-)%-(.-)%-(.-)$"))
+
+			(.. "^("  year "-" month "-0*" (utils.regexp.generate-number-upper-bound-regexp day)
+			    ")|(" year "-0*" (utils.regexp.generate-number-upper-bound-regexp (- month 1)) "-\\d+"
+			    ")|(" (utils.regexp.generate-number-upper-bound-regexp (- year 1)) "-\\d+-\\d+"
+			    ")$"))))
+
 (fn generate-plugin-lockdata [plugin lockdata]
 	(let [pkg-name (nix.normalise-pkg-name plugin.name)
 	      full-pkg-name (.. "vimPlugins." pkg-name)]
@@ -27,7 +40,14 @@
 		; (set pkg.tag (git.get-checked-out-tag plugin.dir))
 
 		(if (= (nix.get-pkg-revision full-pkg-name) plugin.commit)
-			(set lockdata.src (.. "nixpkgs#" full-pkg-name)))
+			(set lockdata.src (.. "nixpkgs#" full-pkg-name))
+
+			(set lockdata.src (-?> plugin.dir
+				(get-version-restraint plugin.dir)
+				(#(nix.get-pkg-versions full-pkg-name $1))
+				(?. 1 :nixInstallable)))
+				(#(if (= (nix.get-pkg-revision $1) plugin.commit) $1)))
+
 
 		(when (and (not lockdata.src) plugin.url)
 			(set lockdata.src (get-nurl-src plugin.url))
