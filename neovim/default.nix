@@ -1,7 +1,49 @@
-{ config, lib, pkgs, utils, user, ... }:
+{ config, lib, pkgs, utils, user, lockfiles, ... }:
 
-utils.merge ([{
-	programs.nixvim = import ./program.nix { inherit lib pkgs utils; };
+let
+	pins = lockfiles.import ./nix-pkgs.lock;
+	plugins = pins.pkgs;
+in utils.merge ([{
+	programs.nixvim = import ./program.nix { inherit lib pkgs utils plugins; };
+
+	nixpkgs.overlays = [
+		pins.overlay
+
+		(_: prev': {
+			vimPlugins = prev'.vimPlugins.extend (_: prev:
+				(builtins.mapAttrs
+					(name: value:
+						prev.${name}.overrideAttrs (old: { doCheck = false; }))
+
+					plugins));
+		})
+
+		(_: prev': {
+			vimPlugins = prev'.vimPlugins.extend (_: prev: {
+				nvim-treesitter = prev.nvim-treesitter.overrideAttrs (old: {
+					# https://github.com/NixOS/nixpkgs/issues/415438#issuecomment-3186621192
+					postPatch = "";
+					buildPhase = ''
+						mkdir -p $out/queries
+						cp -a $src/runtime/queries/* $out/queries
+					'';
+					nvimSkipModules = [ "nvim-treesitter._meta.parsers" ];
+				});
+
+				lazy-nvim = prev.lazy-nvim.overrideAttrs (old: {
+					patches = (old.patches or []) ++ [
+						./patches/lazy-nvim--load-local-config-recursive.patch
+					];
+				});
+
+				snacks-nvim = prev.snacks-nvim.overrideAttrs (old: {
+					patches = (old.patches or []) ++ [
+						./patches/snacks-nvim--allow-multi-char-separators-in-proc.patch
+					];
+				});
+			});
+		})
+	];
 
 	xdg.configFile."nvim/lua".source = let
 		nixvim = config.programs.nixvim.build.package;
@@ -40,8 +82,8 @@ utils.merge ([{
 	xdg.configFile."nvim/parser".source = let
 		parsers = pkgs.symlinkJoin {
 			name = "treesitter-parsers";
-			paths = (pkgs.vimPlugins.nvim-treesitter.withPlugins
-				(plugins: with plugins; [
+			paths = (plugins.nvim-treesitter.withPlugins
+				(ts-plugins: with ts-plugins; [
 					c
 					lua
 					fennel
@@ -62,24 +104,22 @@ utils.merge ([{
 }]
 
 ++
-
-(map
-	(plugin: {
-		xdg.dataFile."neovim/lazy/${plugin.name}" = {
-			source = plugin.path;
-			mutable = true;
-			force = true;
-		};
-	})
-
-	(map
-		(drv:
-			if lib.isDerivation drv then
-				{ name = "${lib.getName drv}"; path = drv; }
-			else
-				drv
-		)
-
-		(import ./plugins.nix { inherit pkgs; })
-	)
-))
+[])
+# (map
+# 	(plugin: {
+# 		xdg.dataFile."neovim/lazy/${plugin.name}" = {
+# 			source = plugin.path;
+# 			mutable = true;
+# 			force = true;
+# 		};
+# 	})
+#
+# 	(map
+# 		(drv:
+# 			if lib.isDerivation drv then
+# 				{ name = "${lib.getName drv}"; path = drv; }
+# 			else
+# 				drv)
+#
+# 		plugins)
+# ))

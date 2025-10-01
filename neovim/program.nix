@@ -1,4 +1,4 @@
-{ lib, pkgs, utils, ... }:
+{ lib, pkgs, utils, plugins, ... }:
 
 {
 	enable = true;
@@ -32,13 +32,13 @@
 		};
 	};
 
-	extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
+	extraPlugins = with pkgs.vimPlugins; [ lazy-nvim ];
 
 	extraConfigLuaPre = let
-		plugins = import ./plugins.nix { inherit pkgs; };
-		lazyPath = utils.linkFarm "lazy-plugins" plugins;
+		lazy-path = utils.linkFarm "lazy-plugins"
+			(lib.attrsets.mapAttrsToList (name: plugin: plugin) plugins);
 	in ''
-		local lazyPath = "${lazyPath}"
+		local lazyPath = "${lazy-path}"
 	'';
 
 	extraConfigLua = builtins.readFile ./init.lua;

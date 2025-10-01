@@ -3,10 +3,11 @@
 let
 	user = import ./user.nix;
 	utils = import ./utils { inherit lib pkgs config user; };
+	lockfiles = import ./nix/lockfiles.nix { inherit lib pkgs; };
 
 	importConfig = (path:
 		import path {
-			inherit lib pkgs config user;
+			inherit lib pkgs config user lockfiles;
 			utils = utils.merge [utils { inherit importConfig; }];
 		}
 	);
@@ -39,10 +40,6 @@ in (configure ([{
 
 		stateVersion = "23.11";
 	};
-
-	nixpkgs.overlays = [
-		(import ./neovim/overlays.nix)
-	];
 
 	programs.home-manager.enable = true;
 	programs.direnv.enable = true;

@@ -42,10 +42,14 @@
 
 	linkFarm = let
 		mkEntryFromDrv = drv:
-			if lib.isDerivation drv then
-				{ name = "${lib.getName drv}"; path = drv; }
-			else
-				drv;
+			let entry =
+				if lib.isDerivation drv then
+					{ name = "${lib.getName drv}"; path = drv; }
+				else if (drv ? "name") && (drv ? "outPath") then
+					{ name = drv.name; path = drv.outPath; }
+				else
+					drv;
+			in entry;
 	in name: entries:
 		pkgs.linkFarm "${name}" (builtins.map mkEntryFromDrv entries);
 }
