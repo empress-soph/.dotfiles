@@ -10,3 +10,5 @@ set -g async_prompt_debug_log_path $HOME/.cache/fish/prompt_debug.log
 # Enable rpoc debug logging
 # set -g rpoc_debug_log_enabled 1
 set -g rpoc_debug_log_path $HOME/.cache/fish/prompt_debug.log
+
+set -gx PSPG "-s 16 --quit-if-one-screen --no-last-row-search --reprint-on-exit"
