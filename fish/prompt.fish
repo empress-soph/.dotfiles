@@ -20,7 +20,7 @@ function uncolour_str -a str
 	echo -n "$str" | sed -r 's/\x1B\[[0-9;]*[JKmsu]//g'
 end
 
-function make_env_string
+function _prompt_make_env_string
 	printf $WHITE'['$DARKPINK"$argv[1]"$WHITE
 
 	if [ -n "$argv[2]" ]
@@ -30,7 +30,7 @@ function make_env_string
 	printf ']'
 end
 
-function git_infostr
+function _prompt_git_infostr
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -72,7 +72,7 @@ function git_infostr
 	printf '%s' "$headstr"
 end
 
-function git_infostr_loading_indicator -a last
+function _prompt_git_infostr_loading_indicator -a last
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -86,7 +86,7 @@ function git_infostr_loading_indicator -a last
 	printf '%s' "$CYAN…"
 end
 
-function git_dirtystr
+function _prompt_git_dirtystr
 	set -l unstaged "$CWD_GIT_REPO_has_unstaged_changes"
 	set -l staged "$CWD_GIT_REPO_has_staged_changes"
 	set -l untracked "$CWD_GIT_REPO_has_untracked_changes"
@@ -100,7 +100,7 @@ function git_dirtystr
 	end
 end
 
-function git_diffstr
+function _prompt_git_diffstr
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -136,7 +136,7 @@ function git_diffstr
 	end
 end
 
-function git_diffstr_loading_indicator -a last
+function _prompt_git_diffstr_loading_indicator -a last
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -157,7 +157,7 @@ function git_diffstr_loading_indicator -a last
 end
 
 # "•" + "'"$GREY"'" +
-function gh_prstr
+function _prompt_gh_prstr
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -186,7 +186,7 @@ function gh_prstr
 
 		# if this returns too fast it isn't actually displayed
 		# so introduce a small unnoticeable delay
-		sleep 0.01
+		sleep 0.03
 
 		printf ' %s' "$(echo "$ghprs" | jq -r "$ghprs_jqfilter" | string join ' ')"
 	end
@@ -194,7 +194,7 @@ function gh_prstr
 	# printf '%s' ' ##'
 end
 
-function gh_prstr_loading_indicator -a last
+function _prompt_gh_prstr_loading_indicator -a last
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -207,22 +207,22 @@ function gh_prstr_loading_indicator -a last
 	# printf ' %s' "$GREY…"
 end
 
-function scmstr
+function _prompt_scmstr
 	update_cwd_git_variables
 	if [ -n "$CWD_IN_GIT_REPO" ]
 		printf '%s' " $WHITE"'g<'
-		printf '%s' "$(git_infostr)"
+		printf '%s' "$(_prompt_git_infostr)"
 		if [ "$rpoc_is_refreshing" = "1" ]
 			printf '%s' "$GREY:$DARKCYAN$CWD_GIT_REPO_hash"
 			# printf '%s' "$(git_dirtystr)"
 		end
-		printf '%s' "$(git_diffstr)"
+		printf '%s' "$(_prompt_git_diffstr)"
 		printf '%s' "$WHITE>"
-		printf '%s' "$(gh_prstr)"
+		printf '%s' "$(_prompt_gh_prstr)"
 	end
 end
 
-function hoststr
+function _prompt_hoststr
 	set -l user "$PINK$(whoami)"
 	set -l host ""
 
@@ -231,13 +231,13 @@ function hoststr
 	end
 
 	if [ -n "$IN_VM" ]
-		set host "$host$(make_env_string 'VM')"
+		set host "$host$(_prompt_make_env_string 'VM')"
 	end
 
 	printf '%s%s' "$user" "$host"
 end
 
-function custom_prompt_pwd
+function prompt_pwd_abbrev
 	set -l dirs (string split '/' (fish_prompt_pwd_dir_length=0 prompt_pwd))
 
 	for dir in $dirs[1..-4]
@@ -265,7 +265,7 @@ function custom_prompt_pwd
 	end
 end
 
-function time_str
+function _prompt_time_str
 	if [ "$rpoc_is_refreshing" = "1" ]
 		set -l time "$(date +%H:%M:%S)"
 		printf '%s' "$(set_color normal)($time)"
@@ -279,7 +279,7 @@ end
 # 	# echo -n (set_color normal)"(--:--:--) "
 # end
 
-function prompt_str
+function _prompt_str
 	set -l prompt '⋊> '
 
 	if [ "$rpoc_is_refreshing" = "1" ]
@@ -294,17 +294,17 @@ function fish_prompt
 	# printf '%s\n%s' (hoststr)(scmstr)" $YELLOW"(custom_prompt_pwd)(set_color normal) '⋊> '
 
 	if test "$rpoc_is_refreshing" = "1" 2>/dev/null
-		printf '%s%s %s\n%s %s' "$(hoststr)" "$(scmstr)" "$DARKYELLOW$(pwd)" "$(time_str)" "$(prompt_str)"
+		printf '%s%s %s\n%s %s' "$(_prompt_hoststr)" "$(_prompt_scmstr)" "$DARKYELLOW$(pwd)" "$(_prompt_time_str)" "$(_prompt_str)"
 	else
 		# echo -e (hoststr)(scmstr)" $YELLOW"(custom_prompt_pwd)"\n"(prompt_str)
-		printf '%s%s %s\n%s' "$(hoststr)" "$(scmstr)" "$YELLOW$(custom_prompt_pwd)" "$(prompt_str)"
+		printf '%s%s %s\n%s' "$(_prompt_hoststr)" "$(_prompt_scmstr)" "$YELLOW$(prompt_pwd_abbrev)" "$(_prompt_str)"
 	end
  end
 
 # shuts up an error in fish-refresh-prompt-on-cmd from not
 # having fish_prompt as an async prompt function
 functions -c fish_prompt '__async_prompt_orig_fish_prompt'
-set -U async_prompt_functions git_infostr git_diffstr gh_prstr
+set -U async_prompt_functions _prompt_git_infostr _prompt_git_diffstr _prompt_gh_prstr
 set -U async_prompt_inherit_variables all
 
 function fish_mode_prompt
@@ -337,7 +337,7 @@ function fish_right_prompt
 	end
 end
 
-function cmd_duration_postexec --on-event fish_postexec
+function _prompt_cmd_duration_postexec --on-event fish_postexec
 	set -l cmd_status "$status"
 
 	set -l dur_str ""
