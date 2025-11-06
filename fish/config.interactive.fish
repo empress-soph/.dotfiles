@@ -32,8 +32,24 @@ function reset_cwd_git_variables
 	set -g CWD_GIT_REPO_gh_prs ""
 end
 
-function update_cwd_git_variables --on-variable PWD
+function update_cwd_git_variables_on_dir_change --on-variable PWD
 	status --is-command-substitution; and return
+
+	update_cwd_git_variables
+end
+
+function update_cwd_git_variables
+	if [ -n "$__CWD_GIT_VARS_UPDATING" ]
+		while true
+			if [ -n "$__CWD_GIT_VARS_UPDATING" ]
+				sleep 0.01
+			end
+		end
+
+		return
+	end
+
+	set -g __CWD_GIT_VARS_UPDATING "1"
 
 	set -g CWD_IN_GIT_REPO "$(git rev-parse --is-inside-work-tree 2> /dev/null)"
 
@@ -49,7 +65,7 @@ function update_cwd_git_variables --on-variable PWD
 		set -g CWD_GIT_REPO "$repo"
 	end
 
-	set -l last_index_update_time "$(stat -f '%m' .git/index)"
+	set -l last_index_update_time "$(stat -f '%m' "$repo/.git/index")"
 	set -l last_checkout_time "$CWD_GIT_REPO_last_checkout_time"
 
 	set -l update_status ""
@@ -76,11 +92,13 @@ function update_cwd_git_variables --on-variable PWD
 	set -l head "$CWD_GIT_REPO_head"
 	set -l hash "$CWD_GIT_REPO_hash"
 
-	if [ "$last_checkout_time" != "$CWD_GIT_REPO_last_checkout_time" ]
+	if [ "0$last_index_update_time" -ge "0$CWD_GIT_REPO_last_checkout_time" ]
 		set branch "$(string match -rg 'On branch (.+)' "$stat")"
 		set head   "$(test -z "$branch" && printf '%s' "$branch" || string match -rg 'HEAD detached at (.+)' "$stat")"
 		set hash   "$(git rev-parse --short HEAD)"
+	end
 
+	if [ "0$last_checkout_time" -gt "0$CWD_GIT_REPO_last_checkout_time" ]
 		if not git remote -v | string match -e -m1 'github.com' >/dev/null
 			set -g CWD_GIT_REPO_gh_prs ""
 		else if [ -n "$branch" ]
@@ -120,4 +138,6 @@ function update_cwd_git_variables --on-variable PWD
 	set -g CWD_GIT_REPO_upstream "$upstream"
 	set -g CWD_GIT_REPO_head "$head"
 	set -g CWD_GIT_REPO_hash "$hash"
+
+	set -g __CWD_GIT_VARS_UPDATING ""
 end

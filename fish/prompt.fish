@@ -35,6 +35,8 @@ function _prompt_git_infostr
 		 return
 	end
 
+	update_cwd_git_variables
+
 	set -l stat "$CWD_GIT_REPO_status"
 	set -l hash "$CWD_GIT_REPO_hash"
 	set -l branch "$CWD_GIT_REPO_branch"
@@ -77,7 +79,7 @@ function _prompt_git_infostr_loading_indicator -a last
 		 return
 	end
 
-	if [ -n "$last" ] && [ "$(git rev-parse --show-toplevel)" = "$(realpath "$CWD_GIT_REPO")" ]
+	if [ -n "$last" ] && [ "$(realpath "$CWD_GIT_REPO")" = "$__prompt_git_repo" ]
 		printf '%s' "$GREY$(uncolour_str $last)"
 
 		return
@@ -105,6 +107,8 @@ function _prompt_git_diffstr
 		 return
 	end
 
+	update_cwd_git_variables
+
 	set -l inserted_lines "$CWD_GIT_REPO_lines_inserted"
 	set -l deleted_lines  "$CWD_GIT_REPO_lines_deleted"
 
@@ -120,7 +124,7 @@ function _prompt_git_diffstr
 
 	# if this returns too fast it isn't actually displayed
 	# so introduce a small unnoticeable delay
-	sleep 0.01
+	sleep 0.03
 
 	set -l sep "$WHITE•"
 	printf " %s$sep%s$sep%s$sep%s" \
@@ -147,7 +151,7 @@ function _prompt_git_diffstr_loading_indicator -a last
 	# 	return
 	# end
 
-	if [ -n "$last" ] && [ "$(git rev-parse --show-toplevel)" = "$(realpath "$CWD_GIT_REPO")" ]
+	if [ -n "$last" ] && [ "$(realpath "$CWD_GIT_REPO")" = "$__prompt_git_repo" ]
 		printf '%s' "$GREY$(uncolour_str $last)"
 
 		return
@@ -161,6 +165,8 @@ function _prompt_gh_prstr
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
+
+	update_cwd_git_variables
 
 	set -l ghprs "$CWD_GIT_REPO_gh_prs"
 
@@ -186,12 +192,14 @@ function _prompt_gh_prstr
 
 		# if this returns too fast it isn't actually displayed
 		# so introduce a small unnoticeable delay
-		sleep 0.03
+		sleep 0.07
 
-		printf ' %s' "$(echo "$ghprs" | jq -r "$ghprs_jqfilter" | string join ' ')"
+		set -l prstr "$(echo "$ghprs" | jq -r "$ghprs_jqfilter" | string join ' ')"
+
+		if [ -n "$prstr" ]
+			printf ' %s' "$prstr"
+		end
 	end
-	#
-	# printf '%s' ' ##'
 end
 
 function _prompt_gh_prstr_loading_indicator -a last
@@ -199,17 +207,18 @@ function _prompt_gh_prstr_loading_indicator -a last
 		 return
 	end
 
-	if [ -n "$last" ] && [ "$dirprev[-1]" = "$PWD" ]
+	if [ -n "$last" ] && [ "$CWD_GIT_REPO" = "$__prompt_git_repo" ]
 		printf '%s' "$GREY$(uncolour_str $last)"
 
 		return
 	end
-	# printf ' %s' "$GREY…"
 end
 
+set -g __prompt_git_repo ""
 function _prompt_scmstr
-	update_cwd_git_variables
 	if [ -n "$CWD_IN_GIT_REPO" ]
+		set -g __prompt_git_repo "$(git rev-parse --show-toplevel)"
+
 		printf '%s' " $WHITE"'g<'
 		printf '%s' "$(_prompt_git_infostr)"
 		if [ "$rpoc_is_refreshing" = "1" ]
