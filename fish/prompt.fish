@@ -14,7 +14,7 @@ set CYAN (echo -e '\001')(set_color brcyan)(echo -e '\002')
 set DARKCYAN (echo -e '\001')(set_color cyan)(echo -e '\002')
 set WHITE (echo -e '\001')(set_color white)(echo -e '\002')
 
-set -gx MYSQL_PS1 "$(printf '\001\033]133;A;\007\002%s:%s>\001\033]133;B;\007\002 ' "$(hostname)" '\d')"
+# set -gx MYSQL_PS1 "$PINK"'\u'"$NORMAL"'@'"$GREEN"'\h'"$NORMAL"'['"$DARKPINK"'mysql'"$NORMAL"'] <'"$CYAN"'\T'"$YELLOW"'\d>'"$NORMAL"' mysql> '
 
 function uncolour_str -a str
 	echo -n "$str" | sed -r 's/\x1B\[[0-9;]*[JKmsu]//g'
@@ -31,30 +31,29 @@ function make_env_string
 end
 
 function git_infostr
-	if [ -z "$(git rev-parse --is-inside-work-tree 2> /dev/null)" ]
+	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
 
-	set -l stat     (git status 2>&1)
-	set -l branch   (string match -rg 'On branch (.+)'                            $stat)
-	set -l upstream (string match -rg 'Your branch is up to date with \'(.+)\'\.' $stat)
-	set -l head     (test -z "$branch" && echo "$branch" || string match -rg 'HEAD detached at (.+)' $stat)
+	set -l stat "$CWD_GIT_REPO_status"
+	set -l hash "$CWD_GIT_REPO_hash"
+	set -l branch "$CWD_GIT_REPO_branch"
 
 	set -l headstr ""
-	if test "$rpoc_is_refreshing" = "1" 2>/dev/null
-		set -l hash (git rev-parse --short HEAD)
+	if [ "$rpoc_is_refreshing" = "1" ]
+		set -l hash "$(git rev-parse --short HEAD)"
 		set headstr "$WHITE:$DARKCYAN$hash"
 	end
 
 	set -l upstreamstr ""
-	if [ -n "$branch" ];
+	if [ -n "$branch" ]
 		set headstr "$CYAN$branch$headstr"
-		if test "$rpoc_is_refreshing" != "1" 2>/dev/null
-			if string match 'Your branch is ahead of' $stat;
+		if [ "$rpoc_is_refreshing" != "1" ]
+			if string match 'Your branch is ahead of' "$stat"
 				set upstreamstr "$GREEN^"
-			else if string match 'Your branch is behind' $stat;
+			else if string match 'Your branch is behind' "$stat";
 				set upstreamstr "$RED""v"
-			else if string match -r '(This branch is \d+ commits? ahead and \d+ commits? behind)' $stat;
+			else if string match -r '(This branch is \d+ commits? ahead and \d+ commits? behind)' "$stat";
 				set upstreamstr "$YELLOW~"
 			end
 		end
@@ -69,77 +68,173 @@ function git_infostr
 	else
 		set headstr "$RED""DETACHED$headstr"
 	end
-
-	set -l shortstat (git status --short 2>&1)
-
-	set -l dirtystr ""
-	if string match 'modified:' $stat;
-		set -l unstaged  (string match 'Changes not staged for commit:' $stat)
-		set -l staged    (string match 'Changes to be committed:'       $stat)
-		set -l untracked (string match 'Untracked files'                $stat)
-
-		if [ -n "$staged" ] && [ -n "$unstaged" ] || [ -n "$untracked" ];
-			set dirtystr "$YELLOW*"
-		else if [ -n "$staged" ];
-			set dirtystr "$GREEN*"
-		else if [ -n "$unstaged" ] || [ -n "$untracked" ];
-			set dirtystr "$RED*"
-		end
-	end
-
-	set -l diffstr ""
-	if test "$rpoc_is_refreshing" != "1" 2>/dev/null
-		set -l diff (git diff --shortstat)
-		set -l inserted (string match -rg '(\d+)(?=\ insertions)' $diff)
-		set -l deleted (string match -rg '(\d+)(?=\ deletions)' $diff)
-
-		set -l untracked_count (string match -r '^\?\?' $shortstat | count)
-		set -l added_count     (string match -r '^\ ?A' $shortstat | count)
-		set -l modified_count  (string match -r '^\ ?M' $shortstat | count)
-		set -l deleted_count   (string match -r '^\ ?D' $shortstat | count)
-
-		set diffstr " $DARKGREEN$untracked_count$WHITE•$ORANGE$modified_count$WHITE•$RED$deleted_count$WHITE•$DARKCYAN$untracked_count"
-
-		if [ -n "$inserted" ] || [ -n "$deleted" ];
-			set diffstr "$diffstr ";
-			if [ -n "$inserted" ]; set diffstr "$diffstr$GREEN$inserted+"; end
-			if [ -n "$deleted"  ]; set diffstr "$diffstr$RED$deleted-";    end
-		end
-	end
-
-	echo "$WHITE""g<$upstreamstr$headstr$dirtystr$diffstr$WHITE>"
+	printf '%s' "$upstreamstr"
+	printf '%s' "$headstr"
 end
 
 function git_infostr_loading_indicator -a last
-	if [ -z "$PWD_IS_IN_GIT_REPO" ]
+	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
 
-	if [ -n $last ];
-		echo "$GREY"(uncolour_str $last)
+	if [ -n "$last" ] && [ "$(git rev-parse --show-toplevel)" = "$(realpath "$CWD_GIT_REPO")" ]
+		printf '%s' "$GREY$(uncolour_str $last)"
+
 		return
 	end
 
-	echo "$WHITE""g<$CYAN…$WHITE>"
+	printf '%s' "$CYAN…"
+end
+
+function git_dirtystr
+	set -l unstaged "$CWD_GIT_REPO_has_unstaged_changes"
+	set -l staged "$CWD_GIT_REPO_has_staged_changes"
+	set -l untracked "$CWD_GIT_REPO_has_untracked_changes"
+
+	if [ -n "$staged" ] && [ -n "$unstaged" ] || [ -n "$untracked" ]
+		printf '%s' "$YELLOW*"
+	else if [ -n "$staged" ]
+		printf '%s' "$GREEN*"
+	else if [ -n "$unstaged" ] || [ -n "$untracked" ]
+		printf '%s' "$RED*"
+	end
+end
+
+function git_diffstr
+	if [ -z "$CWD_IN_GIT_REPO" ]
+		 return
+	end
+
+	set -l inserted_lines "$CWD_GIT_REPO_lines_inserted"
+	set -l deleted_lines  "$CWD_GIT_REPO_lines_deleted"
+
+	set -l added_files     "$CWD_GIT_REPO_added_files"
+	set -l modified_files  "$CWD_GIT_REPO_modified_files"
+	set -l deleted_files   "$CWD_GIT_REPO_deleted_files"
+	set -l untracked_files "$CWD_GIT_REPO_untracked_files"
+
+	set -l added_files_count     "$(test -n "$added_files"     && echo "$added_files"     | count || printf '0')"
+	set -l modified_files_count  "$(test -n "$modified_files"  && echo "$modified_files"  | count || printf '0')"
+	set -l deleted_files_count   "$(test -n "$deleted_files"   && echo "$deleted_files"   | count || printf '0')"
+	set -l untracked_files_count "$(test -n "$untracked_files" && echo "$untracked_files" | count || printf '0')"
+
+	# if this returns too fast it isn't actually displayed
+	# so introduce a small unnoticeable delay
+	sleep 0.01
+
+	set -l sep "$WHITE•"
+	printf " %s$sep%s$sep%s$sep%s" \
+		"$DARKGREEN$added_files_count" \
+		"$ORANGE$modified_files_count" \
+		"$RED$deleted_files_count" \
+		"$DARKCYAN$untracked_files_count"
+
+	if [ -n "$inserted_lines" ] || [ -n "$deleted_lines" ]
+		printf ' '
+		if [ -n "$inserted_lines" ]; printf '%s' "$GREEN$inserted_lines+"; end
+		if [ -n "$deleted_lines"  ]; printf '%s' "$RED$deleted_lines-";    end
+	end
+end
+
+function git_diffstr_loading_indicator -a last
+	if [ -z "$CWD_IN_GIT_REPO" ]
+		 return
+	end
+
+	# if [ -n "$last" ] && [ "$dirprev[-1]" = "$PWD" ]
+	# 	printf '%s' "$GREY$(uncolour_str $last)"
+	#
+	# 	return
+	# end
+
+	if [ -n "$last" ] && [ "$(git rev-parse --show-toplevel)" = "$(realpath "$CWD_GIT_REPO")" ]
+		printf '%s' "$GREY$(uncolour_str $last)"
+
+		return
+	end
+
+	printf ' %s' "$GREY…"
+end
+
+# "•" + "'"$GREY"'" +
+function gh_prstr
+	if [ -z "$CWD_IN_GIT_REPO" ]
+		 return
+	end
+
+	set -l ghprs "$CWD_GIT_REPO_gh_prs"
+
+	if [ -n "$ghprs" ]
+		set -l ghprs_jqfilter "$(echo '
+			map(
+				(
+					if .state == "MERGED" then
+						"'"$(set_color magenta)"'"
+					else
+						if .state == "CLOSED" then
+							"'"$(set_color red)"'"
+						else
+							"'"$(set_color normal)"'"
+						end
+					end
+				)
+				+ "\u001b]8;;" + .url + "\u001b\\\"
+				+ "#\(.number)"
+				+ "\u001b]8;;\u001b\\\"
+			) | .[]
+		')"
+
+		# if this returns too fast it isn't actually displayed
+		# so introduce a small unnoticeable delay
+		sleep 0.01
+
+		printf ' %s' "$(echo "$ghprs" | jq -r "$ghprs_jqfilter" | string join ' ')"
+	end
+	#
+	# printf '%s' ' ##'
+end
+
+function gh_prstr_loading_indicator -a last
+	if [ -z "$CWD_IN_GIT_REPO" ]
+		 return
+	end
+
+	if [ -n "$last" ] && [ "$dirprev[-1]" = "$PWD" ]
+		printf '%s' "$GREY$(uncolour_str $last)"
+
+		return
+	end
+	# printf ' %s' "$GREY…"
 end
 
 function scmstr
-	echo " "(git_infostr)
+	update_cwd_git_variables
+	if [ -n "$CWD_IN_GIT_REPO" ]
+		printf '%s' " $WHITE"'g<'
+		printf '%s' "$(git_infostr)"
+		if [ "$rpoc_is_refreshing" = "1" ]
+			printf '%s' "$GREY:$DARKCYAN$CWD_GIT_REPO_hash"
+			# printf '%s' "$(git_dirtystr)"
+		end
+		printf '%s' "$(git_diffstr)"
+		printf '%s' "$WHITE>"
+		printf '%s' "$(gh_prstr)"
+	end
 end
 
 function hoststr
-	set -l user "$PINK"(whoami)
+	set -l user "$PINK$(whoami)"
 	set -l host ""
 
 	if [ -n "$IN_SSH_SESSION" ]
-		set host "$WHITE@$GREEN"(prompt_hostname)
+		set host "$WHITE@$GREEN$(prompt_hostname)"
 	end
 
 	if [ -n "$IN_VM" ]
-		set host "$host"(make_env_string 'VM')
+		set host "$host$(make_env_string 'VM')"
 	end
 
-	echo "$user$host"
+	printf '%s%s' "$user" "$host"
 end
 
 function custom_prompt_pwd
@@ -154,8 +249,8 @@ function custom_prompt_pwd
 			printf "$dir"
 		# else if [ (string length "$dir") -gt "3" ]
 		# 	printf /"$ORANGE"(string sub --length 3 "$dir")"$YELLOW"
-		else if [ -n (string match -r -i 'a|e|i|o|u' (string sub --start 2 "$dir")) ]
-			printf /"$ORANGE"(string sub --length 1 "$dir")(string replace -r -i -a 'a|e|i|o|u' '' (string sub --start 2 "$dir"))"$YELLOW"
+		else if [ -n "$(string match -r -i 'a|e|i|o|u' "$(string sub --start 2 "$dir")")" ]
+			printf /"$ORANGE$(string sub --length 1 "$dir")$(string replace -r -i -a 'a|e|i|o|u' '' "$(string sub --start 2 "$dir")")$YELLOW"
 		else
 			printf /"$dir"
 		end
@@ -171,42 +266,46 @@ function custom_prompt_pwd
 end
 
 function time_str
-	if test "$rpoc_is_refreshing" = "1" 2>/dev/null
-		set -l time (date +%H:%M:%S)
-		echo -n (set_color normal)'('"$time"')'
+	if [ "$rpoc_is_refreshing" = "1" ]
+		set -l time "$(date +%H:%M:%S)"
+		printf '%s' "$(set_color normal)($time)"
 	else
-		echo -n (set_color normal)"(--:--:--) "
+		printf '%s' "$(set_color normal)(--:--:--)"
 	end
 end
 
-function time_str_loading_indicator -a last
-	echo -n (set_color normal)"(--:--:--) "
-end
-
-set -U async_prompt_functions fish_prompt
-# set -U async_prompt_functions git_infostr
-# shuts up an error in fish-refresh-prompt-on-cmd
-# functions -c fish_prompt '__async_prompt_orig_fish_prompt'
-# set -U async_prompt_functions git_infostr time_str
-# set -U async_prompt_functions fish_prompt
+# function time_str_loading_indicator -a last
+# 	# echo ""
+# 	# echo -n (set_color normal)"(--:--:--) "
+# end
 
 function prompt_str
 	set -l prompt '⋊> '
 
-	if test "$rpoc_is_refreshing" = "1" 2>/dev/null
-		echo -e (set_color normal)"$prompt"(set_color normal)(printf "\033]133;B;\007")
+	if [ "$rpoc_is_refreshing" = "1" ]
+		printf '%s' "$(set_color normal)$prompt$(set_color normal)$(printf '\033]133;B;\007')"
 	else
-		echo -e (set_color normal)"$prompt"(set_color normal)
+		# echo -e (set_color cyan)"$prompt"(set_color normal)
+		printf '%s' "$(set_color normal)$prompt$(set_color normal)"
 	end
 end
 
 function fish_prompt
+	# printf '%s\n%s' (hoststr)(scmstr)" $YELLOW"(custom_prompt_pwd)(set_color normal) '⋊> '
+
 	if test "$rpoc_is_refreshing" = "1" 2>/dev/null
-		echo -e (hoststr)(scmstr)" $DARKYELLOW"(pwd)"\n"(time_str)" "(prompt_str)
+		printf '%s%s %s\n%s %s' "$(hoststr)" "$(scmstr)" "$DARKYELLOW$(pwd)" "$(time_str)" "$(prompt_str)"
 	else
-		echo -e (hoststr)(scmstr)" $YELLOW"(custom_prompt_pwd)"\n"(prompt_str)
+		# echo -e (hoststr)(scmstr)" $YELLOW"(custom_prompt_pwd)"\n"(prompt_str)
+		printf '%s%s %s\n%s' "$(hoststr)" "$(scmstr)" "$YELLOW$(custom_prompt_pwd)" "$(prompt_str)"
 	end
  end
+
+# shuts up an error in fish-refresh-prompt-on-cmd from not
+# having fish_prompt as an async prompt function
+functions -c fish_prompt '__async_prompt_orig_fish_prompt'
+set -U async_prompt_functions git_infostr git_diffstr gh_prstr
+set -U async_prompt_inherit_variables all
 
 function fish_mode_prompt
 	printf ""
@@ -260,10 +359,10 @@ function cmd_duration_postexec --on-event fish_postexec
 		set dur_str '('"$GRAY$dur"')'
 	end
 
-	# set -l exitcode_str ""
-	# if [ "$cmd_status" != "0" ];
-	# 	set exitcode_str "- exited with status code: $cmd_status"
-	# end
+	set -l exitcode_str ""
+	if [ "$cmd_status" != "0" ];
+		set exitcode_str (set_color red)"$cmd_status"(set_color normal)" "
+	end
 
-	echo -ne " ~> $dur_str"
+	printf '%s' " ~> $dur_str"
 end
