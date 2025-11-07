@@ -100,7 +100,7 @@ function update_cwd_git_variables
 
 	if [ "0$last_checkout_time" -gt "0$CWD_GIT_REPO_last_checkout_time" ]
 		set -l rev_name "$(git name-rev --name-only --no-tags --exclude='tags/*' --exclude="stash" HEAD)"
-		if [ -z "$rev_name" ]
+		if [ "$rev_name" = "undefined" ]
 			set rev_name "$(git name-rev --name-only --exclude="stash" HEAD)"
 		end
 
