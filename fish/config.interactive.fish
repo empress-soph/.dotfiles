@@ -95,10 +95,18 @@ function update_cwd_git_variables
 	if [ "0$last_index_update_time" -ge "0$CWD_GIT_REPO_last_checkout_time" ]
 		set branch "$(string match -rg 'On branch (.+)' "$stat")"
 		set head   "$(test -z "$branch" && printf '%s' "$branch" || string match -rg 'HEAD detached at (.+)' "$stat")"
-		set hash   "$(git rev-parse --short HEAD)"
+		set hash   "$(git rev-parse HEAD)"
 	end
 
 	if [ "0$last_checkout_time" -gt "0$CWD_GIT_REPO_last_checkout_time" ]
+		set -l rev_name "$(git name-rev --name-only --no-tags --exclude='tags/*' --exclude="stash" HEAD)"
+		if [ -z "$rev_name" ]
+			set rev_name "$(git name-rev --name-only --exclude="stash" HEAD)"
+		end
+
+		set -g CWD_GIT_REPO_rev_name "$rev_name"
+		set -g CWD_GIT_REPO_rev_tags "$(git tag --points-at HEAD)"
+
 		if not git remote -v | string match -e -m1 'github.com' >/dev/null
 			set -g CWD_GIT_REPO_gh_prs ""
 		else if [ -n "$branch" ]
@@ -114,16 +122,12 @@ function update_cwd_git_variables
 	set -g CWD_GIT_REPO_has_untracked_changes "$(test "$(echo "$untracked_files" | count)" -gt 0 && printf 1)"
 
 	if [ "$last_index_update_time" != "$CWD_GIT_REPO_last_index_update_time" ]
-		# if string match -e 'modified:' "$stat"
 		set -g CWD_GIT_REPO_has_unstaged_changes  "$(string match -qe 'Changes not staged for commit:' "$stat" && printf 1)"
 		set -g CWD_GIT_REPO_has_staged_changes    "$(string match -qe 'Changes to be committed:'       "$stat" && printf 1)"
-		# set -g CWD_GIT_REPO_has_untracked_changes "$(string match -qe 'Untracked files'                "$stat" && printf 1)"
-		# end
 
 		set -g CWD_GIT_REPO_lines_inserted "$(string match -rg '(\d+)(?=\ insertions)' "$diff")"
 		set -g CWD_GIT_REPO_lines_deleted "$(string match -rg '(\d+)(?=\ deletions)' "$diff")"
 
-		# set -g CWD_GIT_REPO_untracked_files_count "$(echo -e "$shortstat" | string match -r '^\?\?' | count)"
 		set -g CWD_GIT_REPO_added_files     "$(echo -e "$shortstat" | string match -r '(?<=^\ ?A).*')"
 		set -g CWD_GIT_REPO_modified_files  "$(echo -e "$shortstat" | string match -r '(?<=^\ ?M).*')"
 		set -g CWD_GIT_REPO_deleted_files   "$(echo -e "$shortstat" | string match -r '(?<=^\ ?D).*')"

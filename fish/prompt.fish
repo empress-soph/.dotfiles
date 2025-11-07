@@ -30,7 +30,7 @@ function _prompt_make_env_string
 	printf ']'
 end
 
-function _prompt_git_infostr
+function _prompt_git_namestr
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -38,43 +38,27 @@ function _prompt_git_infostr
 	update_cwd_git_variables
 
 	set -l stat "$CWD_GIT_REPO_status"
-	set -l hash "$CWD_GIT_REPO_hash"
 	set -l branch "$CWD_GIT_REPO_branch"
+	set -l rev_name "$CWD_GIT_REPO_rev_name"
 
-	set -l headstr ""
-	if [ "$rpoc_is_refreshing" = "1" ]
-		set -l hash "$(git rev-parse --short HEAD)"
-		set headstr "$WHITE:$DARKCYAN$hash"
+	if string match -qrg 'HEAD detached at (.+)' "$stat"
+		printf '%s' "$RED""DETACHED "
 	end
 
-	set -l upstreamstr ""
-	if [ -n "$branch" ]
-		set headstr "$CYAN$branch$headstr"
-		if [ "$rpoc_is_refreshing" != "1" ]
-			if string match 'Your branch is ahead of' "$stat"
-				set upstreamstr "$GREEN^"
-			else if string match 'Your branch is behind' "$stat";
-				set upstreamstr "$RED""v"
-			else if string match -r '(This branch is \d+ commits? ahead and \d+ commits? behind)' "$stat";
-				set upstreamstr "$YELLOW~"
-			end
+	if [ -n "$branch" ] && [ "$rpoc_is_refreshing" != "1" ]
+		if string match -qe 'Your branch is ahead of' "$stat"
+			printf '%s' "$GREEN^"
+		else if string match -qe 'Your branch is behind' "$stat";
+			printf '%s' "$RED""v"
+		else if string match -rq '(This branch is \d+ commits? ahead and \d+ commits? behind)' "$stat";
+			printf '%s' "$YELLOW~"
 		end
-
-		# if git cherry "$branch" 'origin/HEAD' | string match '+';
-		# 	set upstream_info "$upstream_info$CYAN[$RED!$CYAN]"
-		# end
-
-		# if [ -n "$upstream" ];
-		# 	set -l cherry (git cherry "$branch" "$upstream" 2>&1)
-		# end
-	else
-		set headstr "$RED""DETACHED$headstr"
 	end
-	printf '%s' "$upstreamstr"
-	printf '%s' "$headstr"
+
+	printf '%s' "$CYAN$(string replace -r '~(\d+)$' "$WHITE~\1" "$rev_name")"
 end
 
-function _prompt_git_infostr_loading_indicator -a last
+function _prompt_git_namestr_loading_indicator -a last
 	if [ -z "$CWD_IN_GIT_REPO" ]
 		 return
 	end
@@ -86,6 +70,34 @@ function _prompt_git_infostr_loading_indicator -a last
 	end
 
 	printf '%s' "$CYAN…"
+end
+
+function _prompt_git_tagstr
+	if [ -z "$CWD_IN_GIT_REPO" ]
+		 return
+	end
+
+	update_cwd_git_variables
+
+	set -l rev_tags "$CWD_GIT_REPO_rev_tags"
+
+	if [ -n "$rev_tags" ]
+		printf "$WHITE [$DARKCYAN%s$WHITE]" "$(string join ' ' (echo "$rev_tags"))"
+	end
+end
+
+function _prompt_git_tagstr_loading_indicator -a last
+	if [ -z "$CWD_IN_GIT_REPO" ]
+		 return
+	end
+
+	if [ -n "$last" ] && [ "$(realpath "$CWD_GIT_REPO")" = "$__prompt_git_repo" ]
+		printf '%s' "$GREY$(uncolour_str $last)"
+
+		return
+	end
+
+	# printf '%s' "$CYAN…"
 end
 
 function _prompt_git_dirtystr
@@ -220,11 +232,15 @@ function _prompt_scmstr
 		set -g __prompt_git_repo "$(git rev-parse --show-toplevel)"
 
 		printf '%s' " $WHITE"'g<'
-		printf '%s' "$(_prompt_git_infostr)"
+		printf '%s' "$(_prompt_git_namestr)"
 		if [ "$rpoc_is_refreshing" = "1" ]
-			printf '%s' "$GREY:$DARKCYAN$CWD_GIT_REPO_hash"
-			# printf '%s' "$(git_dirtystr)"
+			if [ -n "$CWD_GIT_REPO_rev_name" ]
+				printf '%s' "$WHITE:"
+			end
+
+			printf "$DARKCYAN%s" "$(string match -r '.{8}' "$CWD_GIT_REPO_hash")"
 		end
+		printf '%s' "$(_prompt_git_tagstr)"
 		printf '%s' "$(_prompt_git_diffstr)"
 		printf '%s' "$WHITE>"
 		printf '%s' "$(_prompt_gh_prstr)"
@@ -313,7 +329,7 @@ function fish_prompt
 # shuts up an error in fish-refresh-prompt-on-cmd from not
 # having fish_prompt as an async prompt function
 functions -c fish_prompt '__async_prompt_orig_fish_prompt'
-set -U async_prompt_functions _prompt_git_infostr _prompt_git_diffstr _prompt_gh_prstr
+set -U async_prompt_functions _prompt_git_namestr _prompt_git_tagstr _prompt_git_diffstr _prompt_gh_prstr
 set -U async_prompt_inherit_variables all
 
 function fish_mode_prompt
