@@ -110,7 +110,7 @@ function update_cwd_git_variables
 		if not git remote -v | string match -e -m1 'github.com' >/dev/null
 			set -g CWD_GIT_REPO_gh_prs ""
 		else if [ -n "$branch" ]
-			set -g CWD_GIT_REPO_gh_prs "$(gh pr list --json="number,url,state" --head="$branch" --state="all" 2>/dev/null)"
+			set -g CWD_GIT_REPO_gh_prs "$(gh pr list --json="number,url,state" --search="$hash" --state="all" 2>/dev/null)"
 		end
 
 		set -g CWD_GIT_REPO_last_checkout_time "$last_checkout_time"
