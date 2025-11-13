@@ -187,17 +187,17 @@ function _prompt_gh_prstr
 			map(
 				(
 					if .state == "MERGED" then
-						"'"$(set_color magenta)"'"
+						"'"$(set_color magenta)$(printf '%b ' '\\uea64')"'"
 					else
 						if .state == "CLOSED" then
-							"'"$(set_color red)"'"
+							"'"$(set_color red)$(printf '%b ' '\\uebda')"'"
 						else
-							"'"$(set_color normal)"'"
+							"'"$(set_color normal)$(printf '%b ' '\\uebdb')"'"
 						end
 					end
 				)
 				+ "\u001b]8;;" + .url + "\u001b\\\"
-				+ "#\(.number)"
+				+ "'"$(set_color normal)"'#\(.number)"
 				+ "\u001b]8;;\u001b\\\"
 			) | .[]
 		')"

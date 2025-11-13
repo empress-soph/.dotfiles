@@ -99,9 +99,17 @@ function update_cwd_git_variables
 	end
 
 	if [ "0$last_checkout_time" -gt "0$CWD_GIT_REPO_last_checkout_time" ]
-		set -l rev_name "$(git name-rev --name-only --no-tags --exclude='tags/*' --exclude="stash" HEAD)"
+		set -l rev_name "$branch"
+		if [ -n "$rev_name" ]
+			set -l rev_name "$(git name-rev --name-only --no-tags --exclude='tags/*' --exclude="stash" HEAD)"
+		end
 		if [ "$rev_name" = "undefined" ]
 			set rev_name "$(git name-rev --name-only --exclude="stash" HEAD)"
+		end
+		set -l remotes "$(git remote)"
+
+		if [ -n "$remotes" ]
+			set rev_name "$(string replace -r "^remotes/($(string join '|' (printf '%s' "$remotes" | string escape --style=regex)))/" '' "$rev_name")"
 		end
 
 		set -g CWD_GIT_REPO_rev_name "$rev_name"
@@ -109,7 +117,7 @@ function update_cwd_git_variables
 
 		if not git remote -v | string match -e -m1 'github.com' >/dev/null
 			set -g CWD_GIT_REPO_gh_prs ""
-		else
+		else if [ -n "$branch" ]
 			set -l prquery "$hash"
 			if [ -z "$branch" ]
 				set prquery "$prquery OR head:$branch"
