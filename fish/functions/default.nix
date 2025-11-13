@@ -7,4 +7,8 @@
 	md5sum = { body = "md5 -r \"$argv\""; };
 
 	fish_title = { body = builtins.readFile ./fish_title.fish; };
+
+	update_cwd_git_variables = {
+		body = builtins.readFile ./update_cwd_git_variables.fish;
+	};
 }
