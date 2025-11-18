@@ -110,21 +110,20 @@ let
 			name = lib.lists.last path;
 			pins-for-path = getPinsByNixpkgsPath path pins;
 			pin =
-				if (builtins.length pins-for-path) == 1 then
+				if (builtins.length pins-for-path) == 1
+					&& (builtins.head pins-for-path).nixpkgs-path == path
+				then
 					(builtins.head pins-for-path)
 				else
+					# throw ''Mismatched nixpkgs path when resolving at override path "${lib.concatStringsSep "/" path}"; found pin with nixpkg path "${lib.concatStringsSep "/" pin.nixpkgs-path}"''
 					null;
 		in if pin != null then
-			if pin.nixpkgs-path == path then
-				(let
-					resolved = resolveOverride pin;
-				in if (resolved != null) && prev != null && (prev ? "${name}") then
-					prev.${name}.overrideAttrs resolved
-				else
-					resolved)
-					# lib.makeExtensible (_: resolved))
+			(let
+				resolved = resolveOverride pin;
+			in if (resolved != null) && prev != null && (prev ? "${name}") then
+				prev.${name}.overrideAttrs resolved
 			else
-				throw "Mismatched paths when resolving pin ${name}"
+				resolved)
 		else if prev != null && (prev ? "${name}") then
 			prev.${name}.extend (_: prev':
 				builtins.listToAttrs
