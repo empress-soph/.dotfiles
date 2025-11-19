@@ -35,7 +35,7 @@ let
 				}
 				else
 					{ inherit nixpkgs-path; }
-		else if pin-src ? "fetcher" then
+		else if pin-src ? fetcher then
 			let
 				fetcher-path = lib.strings.splitString "." pin-src.fetcher;
 				fetcher = lib.attrsets.getAttrFromPath fetcher-path pkgs;
@@ -69,7 +69,7 @@ let
 					;
 			in
 				pkg
-		else if pin-src ? "flake" then
+		else if pin-src ? flake then
 			builtins.getFlake pin-src.flake
 		else throw "Unknown src type";
 
@@ -120,11 +120,11 @@ let
 		in if pin != null then
 			(let
 				resolved = resolveOverride pin;
-			in if (resolved != null) && prev != null && (prev ? "${name}") then
+			in if (resolved != null) && prev != null && (prev ? ${name}) then
 				prev.${name}.overrideAttrs resolved
 			else
 				resolved)
-		else if prev != null && (prev ? "${name}") then
+		else if prev != null && (prev ? ${name}) then
 			prev.${name}.extend (_: prev':
 				builtins.listToAttrs
 					(builtins.filter
