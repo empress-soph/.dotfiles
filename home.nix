@@ -3,7 +3,7 @@
 let
 	user = import ./user.nix;
 	utils = import ./utils { inherit lib pkgs config user; };
-	lockfiles = import ./nix/lockfiles.nix { inherit lib pkgs; };
+	lockfiles = import ./nix/lockfiles.nix { inherit lib pkgs utils; };
 
 	importConfig = (path:
 		import path {

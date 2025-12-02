@@ -52,4 +52,6 @@
 			in entry;
 	in name: entries:
 		pkgs.linkFarm "${name}" (builtins.map mkEntryFromDrv entries);
+
+	filterMapAttrs = pred: f: set: lib.attrsets.filterAttrs pred (builtins.mapAttrs f set);
 }

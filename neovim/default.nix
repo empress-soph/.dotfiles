@@ -1,21 +1,29 @@
 { config, lib, pkgs, utils, user, lockfiles, ... }:
 
 let
-	pins = lockfiles.import ./nix-pkgs.lock;
-	plugins = pins.pkgs;
+	lockfile = lockfiles.import ./nix-pkgs.lock;
+	plugins = lockfile.pkgs;
 in utils.merge ([{
-	programs.nixvim = import ./program.nix { inherit lib pkgs utils plugins; };
-
 	nixpkgs.overlays = [
-		pins.overlay
+		lockfile.overlay
 
 		(_: prev': {
 			vimPlugins = prev'.vimPlugins.extend (_: prev:
-				(builtins.mapAttrs
-					(name: value:
-						prev.${name}.overrideAttrs (old: { doCheck = false; }))
+				(builtins.listToAttrs
+					(builtins.map
+						(name: {
+							inherit name;
+							value = prev.${name}.overrideAttrs (old: { doCheck = false; });
+						})
 
-					plugins));
+						(lib.attrsets.mapAttrsToList
+							(name: pin: pin.name)
+
+							(lib.attrsets.filterAttrs
+								(name: pin: pin.is-override)
+
+								lockfile.pins)))))
+				;
 		})
 
 		(_: prev': {
@@ -44,6 +52,8 @@ in utils.merge ([{
 			});
 		})
 	];
+
+	programs.nixvim = import ./program.nix { inherit lib pkgs utils plugins; };
 
 	xdg.configFile."nvim/lua".source = let
 		nixvim = config.programs.nixvim.build.package;
