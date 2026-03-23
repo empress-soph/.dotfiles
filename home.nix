@@ -31,8 +31,9 @@ in (configure ([{
 		packages = with pkgs; [
 			fish
 			iterm2
-			fennel
 			nurl
+
+			luaPackages.fennel
 		];
 
 		username = user.name;

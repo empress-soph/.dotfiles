@@ -8,10 +8,11 @@
 	withRuby = false;
 
 	extraPackages = with pkgs; [
-		fennel
 		stylua
 		ripgrep
 		fd
+
+		luaPackages.fennel
 	];
 
 	plugins = {

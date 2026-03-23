@@ -1,0 +1,26 @@
+{
+  "meta": {
+    "generated": "2026-01-13T14:17:45.808303Z"
+  },
+  "pkgs": {
+    "folke/lazy-nvim": {
+      "url": "https://github.com/folke/lazy.nvim",
+      "src-override": {
+        "args": {
+          "repo": "lazy.nvim",
+          "rev": "306a05526ada86a7b30af95c5cc81ffba93fef97",
+          "owner": "folke",
+          "hash": "sha256-5A4kducPwKb5fKX4oSUFvo898P0dqfsqqLxFaXBsbQY="
+        },
+        "fetcher": "fetchFromGitHub"
+      },
+      "rev": "306a05526ada86a7b30af95c5cc81ffba93fef97",
+      "pkg": "vimPlugins.lazy-nvim",
+      "overrides": "vimPlugins.lazy-nvim",
+      "src": {
+        "installable": "nixpkgs#vimPlugins.lazy-nvim",
+        "version": "2025-11-06"
+      }
+    }
+  }
+}

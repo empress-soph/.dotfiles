@@ -4,6 +4,9 @@
 update:
 	home-manager switch --flake .#dotfiles
 
+build:
+	home-manager build --flake .#dotfiles
+
 clean:
 	make -C neovim clean
 

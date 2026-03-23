@@ -49,10 +49,10 @@
 (fn get-ignorefile [cwd name generate-cb]
   (if (not (. ignorefiles cwd))
 	  (tset ignorefiles cwd {}))
-  (or (. ignorefiles cwd type)
+  (or (?. ignorefiles cwd)
 	  (let [ignorefile (write-tmpfile (generate-cb))]
 	  	(tset ignorefiles cwd name ignorefile)
-		ignorefile)))
+	  	ignorefile)))
 
 (fn set-ignore-args [opts]
 	(when (not opts.args)

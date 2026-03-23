@@ -360,6 +360,11 @@ function fish_right_prompt
 			echo $mode
 		end
 	end
+
+	# if test "$rpoc_is_refreshing" = "1" 2>/dev/null
+	# 	set -l time (date +%H:%M)
+	# 	echo " $GRAY$time"
+	# end
 end
 
 function _prompt_cmd_duration_postexec --on-event fish_postexec
@@ -374,7 +379,7 @@ function _prompt_cmd_duration_postexec --on-event fish_postexec
 
 		set -l dur ""
 
-		# always show around 3 digits of accuracy
+		# Goal: always show around 3 digits of accuracy
 		if      [ "$h"  -gt "1"  ]; set dur (printf '%.0f' "$h")h(printf '%.0f' "$m")m
 		else if [ "$m"  -gt "1"  ]; set dur (printf '%.0f' "$m")m(printf '%.0f' "$s")s
 		else if [ "$s"  -gt "1"  ]; set dur (printf '%.2f' "$s")s
